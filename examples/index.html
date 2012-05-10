@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>DP Examples</title>
+	<link rel="stylesheet" type="text/css" href="example_style.css">
+	<script type="text/javascript" src="../lib/externals/jquery-1.7.2.js"></script>
+
+  <!-- Source -->
+	<link rel="stylesheet" type="text/css" href="../src/style.css">
+	<script type="text/javascript" src="../tmp/src/chronos.js"></script>
+  <script type="text/javascript" src="../tmp/src/plugin.js"></script>
+
+</head>
+<body>
+
+<section>
+  <h2>Basic</h2>
+  <code>$('#basic').chronos();</code>
+  <input id="basic" type="text" name="basic" />
+</section>
+
+<section>
+  <h2>With Time Picker</h2>
+  <code>$('#w_time_picker').chronos({timePicker: true});</code>
+  <input id="w_time_picker" name="w_time_picker" type="text" />
+</section>
+
+<section>
+  <h2>With Maximum and Minimum Dates Set</h2>
+  <p>Note the code below uses a Date object only to keep with the present date.</p>
+  <code>var d = new Date(),
+  mind = new Date(),
+  maxd = new Date(),
+  maxStr, minStr;
+  maxd.setDate(d.getDate()+7);
+  mind.setDate(d.getDate()-7);
+  maxStr = maxd.getDate() + "-" + maxd.getMonth() + "-" + maxd.getFullYear(),
+  minStr = mind.getDate() + "-" + mind.getMonth() + "-" + mind.getFullYear();
+  $('#w_date_range').chronos({ timePicker: true,
+    format: 'j F Y @ h:iA',
+    degbug: true,
+    inputOutputFormat: 'd-m-Y H:i:s',
+    maxDate: {
+      date: maxStr,
+      format: 'd-m-yyyy'
+    },
+    minDate: {
+      date: minStr,
+      format: 'd-m-yyyy'
+    }
+  });
+  </code>
+  <input id="w_date_range" type="text" />
+</section>
+
+<section>
+  <h2>With Time Picker Callbacks</h2>
+  <p>Each picker uses callbacks to restrict the range of the sibling picker.</p>
+  <code>$('.time_picker_callbacks').chronos({timePicker: true});</code>
+  <label for="time_picker_callback1">
+    Departure:
+  </label>
+  <input id="time_picker_callback1" class="time_picker_callbacks" type="text"
+         data-tipe="departure" name="picker[departure]" />
+  <label for="time_picker_callback1">
+    Arrival:
+  </label>
+  <input id="time_picker_callback2" class="time_picker_callbacks" type="text"
+         data-tipe="arrival" name="picker[arrival]"/>
+</section>
+
+  <script type="text/javascript">
+    // Basic
+    var temp = $('#basic').chronos();
+    console.log("chronos is: ", temp);
+    temp.whatever();
+
+    $('#basic').chronos("whatever", {an: "object"}, "again")
+
+    // Time Picker
+    // $('#w_time_picker').chronos({timePicker: true,
+    //   format: 'j F Y @ h:iA'
+    // });
+
+    // // Date Range
+    // var d = new Date(),
+    //     mind = new Date(),
+    //     maxd = new Date(),
+    //     maxStr, minStr;
+    // maxd.setDate(d.getDate()+7);
+    // mind.setDate(d.getDate()-7);
+    // maxStr = maxd.getDate() + "-" + maxd.getMonth() + "-" + maxd.getFullYear(),
+    // minStr = mind.getDate() + "-" + mind.getMonth() + "-" + mind.getFullYear();
+    // $('#w_date_range').chronos({ timePicker: true,
+    //   debug: true,
+    //   format: 'j F Y @ h:iA',
+    //   inputOutputFormat: 'd-m-Y H:i:s',
+    //   maxDate: {
+    //     date: maxStr,
+    //     format: 'd-m-yyyy'
+    //   },
+    //   minDate: {
+    //     date: minStr,
+    //     format: 'd-m-yyyy'
+    //   }
+    // });
+
+    // $('.time_picker_callbacks').chronos({ timePicker: true,
+    //   format: 'j F Y @ h:iA',
+    //   inputOutputFormat: 'd-m-Y H:i:s',
+    //   onSelect: function(pickerObj, date) {
+    //     console.log("inside onselect callback");
+    //     var $el, $target;
+    //     $el = $(pickerObj.current.value_element)
+    //     if ($el.attr("data-tipe") === "departure") {
+    //       //$target = $el.siblings("[name]='picker[arrival]'");
+    //       $target = $("#time_picker_callback2");
+    //       console.log("T:", $target);
+    //       $target.chronos('setDateRange', {minDate: date});
+    //     } else {
+    //       $target = $el.siblings("[name]='picker[departure]'");
+    //       $target.chronos('setDateRange', {maxDate: date});
+    //     }
+    //   }
+    // });
+
+  </script>
+</body>
+</html>

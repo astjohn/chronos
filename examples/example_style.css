@@ -1,0 +1,12 @@
+code {
+  border:1px dashed #E1E1E1;
+  color:#333344;
+  background:#FAFAFA;
+  font-family:monospace;
+  overflow:auto;
+  font-size:11px;
+  padding:1em;
+  display: block;
+  white-space: pre;
+  width: 550px;
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Chronos",
+  "description": "A modern datepicker",
+  "author": "Adam St. John <astjohn@gmail.com>",
+  "version": "0.0.1",
+  "dependencies": {},
+  "devDependencies": {
+    "coffee-script": "*",
+    "coffeelint": "*",
+    "colors": "*",
+    "wrench": "*"
+  }
+}
