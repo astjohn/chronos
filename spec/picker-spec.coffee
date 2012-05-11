@@ -1,9 +1,12 @@
 describe "picker", ->
   input = "<input type='text' />"
+  c = new Chronos()
+
 
 
   describe "creating a new picker", ->
 
-    it "sets it's $valueElement to a jQuery object", ->
-      p = new Picker(input)
-      expect(p.$valueElement.hide()).not.toBeUndefined() # duck type
+  describe "private methods", ->
+
+    describe "#_initialize", ->
+

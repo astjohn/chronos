@@ -3,11 +3,13 @@
 <head>
 	<title>DP Examples</title>
 	<link rel="stylesheet" type="text/css" href="example_style.css">
-	<script type="text/javascript" src="../lib/externals/jquery-1.7.2.js"></script>
+	<script type="text/javascript" src="../lib/jquery-1.7.2.js"></script>
 
   <!-- Source -->
 	<link rel="stylesheet" type="text/css" href="../src/style.css">
 	<script type="text/javascript" src="../tmp/src/chronos.js"></script>
+  <script type="text/javascript" src="../tmp/src/dateFormatter.js"></script>
+  <script type="text/javascript" src="../tmp/src/picker.js"></script>
   <script type="text/javascript" src="../tmp/src/plugin.js"></script>
 
 </head>
@@ -72,10 +74,7 @@
   <script type="text/javascript">
     // Basic
     var temp = $('#basic').chronos();
-    console.log("chronos is: ", temp);
-    temp.whatever();
 
-    $('#basic').chronos("whatever", {an: "object"}, "again")
 
     // Time Picker
     // $('#w_time_picker').chronos({timePicker: true,

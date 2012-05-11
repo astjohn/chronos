@@ -1,8 +1,12 @@
 class Picker
 
-  constructor: (element) ->
+  constructor: (element, settings) ->
     @$valueElement = $(element)
+    @settings = settings
 
-    @initialize()
 
-  initialize: ->
+    @_initialize()
+
+  _initialize: ->
+
+
