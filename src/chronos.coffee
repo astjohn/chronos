@@ -9,8 +9,8 @@ class chronos.Chronos
 
 
 
-  _defaultOptions:
-    pickerClass: 'wpd'
+  @_defaultOptions:
+    pickerClass: 'blue'
 
     dayNames: [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sunday",
                 "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ]
@@ -56,7 +56,7 @@ class chronos.Chronos
   # Returns chronos object
   _attach: (element, options) ->
     @current =
-      settings: $.extend({}, this._defaultOptions, options);
+      options: $.extend({}, chronos.Chronos._defaultOptions, options);
       valueElement: element
 
     $de = @_buildDisplayElement()
@@ -66,7 +66,7 @@ class chronos.Chronos
   # creates a duplicate input element for display purposes
   # Returns the display element
   _buildDisplayElement: ->
-    s = @current.settings
+    s = @current.options
     df = new chronos.DateFormatter(s)
     $ve = $(@current.valueElement)
     initValue = $ve.val()

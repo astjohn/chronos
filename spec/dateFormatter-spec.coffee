@@ -1,6 +1,6 @@
-describe "dateFormatter", ->
+describe "DateFormatter", ->
   c = new chronos.Chronos()
-  df = new chronos.DateFormatter(c._defaultOptions)
+  df = new chronos.DateFormatter(chronos.Chronos._defaultOptions)
   d = new Date("Thu May 11 2012 16:46:56 GMT-0400 (EDT)")
 
   describe "custom patterns", ->

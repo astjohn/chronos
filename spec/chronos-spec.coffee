@@ -1,4 +1,4 @@
-describe "chronos", ->
+describe "Chronos", ->
   c = {}
   input = {}
 
@@ -37,11 +37,11 @@ describe "chronos", ->
 
       it "sets @current.settings to the default settings if given no settings", ->
         c._attach(input, {})
-        expect(c.current.settings).toEqual(c._defaultOptions)
+        expect(c.current.options).toEqual(chronos.Chronos._defaultOptions)
 
       it "allows for overriding the default settings", ->
         c._attach(input, {valueFormat: 'X'})
-        expect(c.current.settings.valueFormat).toEqual('X')
+        expect(c.current.options.valueFormat).toEqual('X')
 
       it "builds the displayElement", ->
         spyOn(c, '_buildDisplayElement').andReturn(["mockDisplayElement"])
@@ -63,7 +63,7 @@ describe "chronos", ->
       beforeEach ->
         $ve = $(input)
         c.current =
-          settings: c._defaultOptions
+          options: chronos.Chronos._defaultOptions
           valueElement: $ve[0]
 
       it "returns the display element", ->
@@ -78,7 +78,7 @@ describe "chronos", ->
         expect($ve.attr('style')).toEqual('display: none; ')
 
       it "does not hide the value element if debug is enabled", ->
-        c.current.settings = $.extend(c._defaultOptions, {debug: true})
+        c.current.options = $.extend(chronos.Chronos._defaultOptions, {debug: true})
         $de = c._buildDisplayElement()
         expect($ve.attr('style')).toBeUndefined()
 
@@ -92,7 +92,7 @@ describe "chronos", ->
           expect($de.val()).toBeTruthy()
 
         it "sets the value if startBlank is false", ->
-          c.current.settings = $.extend(c._defaultOptions, {startBlank: true})
+          c.current.options = $.extend(chronos.Chronos._defaultOptions, {startBlank: true})
           $de = c._buildDisplayElement()
           expect($de.val()).toBeFalsy()
 
