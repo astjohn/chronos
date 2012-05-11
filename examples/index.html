@@ -22,9 +22,9 @@
 </section>
 
 <section>
-  <h2>With Time Picker</h2>
-  <code>$('#w_time_picker').chronos({timePicker: true});</code>
-  <input id="w_time_picker" name="w_time_picker" type="text" />
+  <h2>Without Time Picker</h2>
+  <code>$('#no_time_picker').chronos({timePicker: false});</code>
+  <input id="no_time_picker" name="no_time_picker" type="text" />
 </section>
 
 <section>
@@ -76,10 +76,8 @@
     var temp = $('#basic').chronos();
 
 
-    // Time Picker
-    // $('#w_time_picker').chronos({timePicker: true,
-    //   format: 'j F Y @ h:iA'
-    // });
+    // No Time Picker
+    $('#no_time_picker').chronos({timePicker: false});
 
     // // Date Range
     // var d = new Date(),

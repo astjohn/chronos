@@ -1,11 +1,11 @@
 # This datepicker uses a singleton pattern to manage all possible datepickers on a given page.
 ( ($, window, document) ->
 
-
   ###
     DATEPICKER PLUGIN DEFINITION
   ###
   $.fn.chronos = (options) ->
+
     PROP_NAME = 'chronos'
 
     otherArgs = Array.prototype.slice.call(arguments, 1)
@@ -56,7 +56,7 @@
 
 
   # Singleton instance
-  $.chronos = new Chronos();
+  $.chronos = new chronos.Chronos();
 
 
 )(jQuery || Zepto, window, document)

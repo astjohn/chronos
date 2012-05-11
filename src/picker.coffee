@@ -1,12 +1,9 @@
-class Picker
+class chronos.Picker
 
-  constructor: (element, settings) ->
-    @$valueElement = $(element)
-    @settings = settings
-
-
+  constructor: (current) ->
+    @current = current
     @_initialize()
 
   _initialize: ->
-
+    console.log "HERE"
 

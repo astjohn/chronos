@@ -3,7 +3,7 @@ describe "chronos", ->
   input = {}
 
   beforeEach ->
-    c = new Chronos()
+    c = new chronos.Chronos()
     input = "<input type='text' />"
 
   describe "public methods", ->
@@ -44,9 +44,19 @@ describe "chronos", ->
         expect(c.current.settings.valueFormat).toEqual('X')
 
       it "builds the displayElement", ->
-        c._buildDisplayElement = jasmine.createSpy("_buildDisplayElement")
+        spyOn(c, '_buildDisplayElement').andReturn(["mockDisplayElement"])
         c._attach(input, {})
         expect(c._buildDisplayElement).toHaveBeenCalled()
+
+      it "saves the valueElement to @current", ->
+        c._attach(input, {})
+        expect(c.current.valueElement).toBe(input)
+
+      it "saves the displayElement to @current", ->
+        spyOn(c, '_buildDisplayElement').andReturn(["mockDisplayElement"])
+        c._attach(input, {})
+        expect(c.current.displayElement).toEqual("mockDisplayElement")
+
 
     describe "#_buildDisplayElement", ->
       $ve = {}
@@ -56,9 +66,8 @@ describe "chronos", ->
           settings: c._defaultOptions
           valueElement: $ve[0]
 
-      it "creates a clone of the valueElement", ->
-        $de = c._buildDisplayElement()
-        expect($de.hide()).not.toBeUndefined() # duck type
+      it "returns the display element", ->
+        expect(c._buildDisplayElement().hide()).not.toBeUndefined() #duck type
 
       it "removes the name attribute from the clone", ->
         $de = c._buildDisplayElement()
@@ -91,3 +100,24 @@ describe "chronos", ->
         $de = c._buildDisplayElement()
         expect($.data($de[0], c.PROP_NAME)).toBeTruthy()
 
+
+    describe "#_renderPicker", ->
+      it "creates a new Picker", ->
+        spyOn(chronos, 'Picker')
+        c._renderPicker()
+        expect(chronos.Picker).toHaveBeenCalledWith(c.current)
+
+
+  describe "bindings", ->
+
+    describe "#_onFocus", ->
+
+      it "calls #setCurrentElement", ->
+        c.setCurrentElement = jasmine.createSpy("setCurrentElement")
+        c._onFocus({target: "some target"})
+        expect(c.setCurrentElement).toHaveBeenCalledWith("some target")
+
+      it "calls #_renderPicker", ->
+        c._renderPicker = jasmine.createSpy("_renderPicker")
+        c._onFocus({target: "some target"})
+        expect(c._renderPicker).toHaveBeenCalled()

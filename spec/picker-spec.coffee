@@ -1,6 +1,6 @@
 describe "picker", ->
   input = "<input type='text' />"
-  c = new Chronos()
+  c = new chronos.Chronos()
 
 
 

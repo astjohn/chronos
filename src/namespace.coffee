@@ -1,0 +1,2 @@
+# namespace
+window.chronos = {}

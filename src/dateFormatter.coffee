@@ -13,7 +13,7 @@
 #  The date defaults to the current date/time.
 #  The mask defaults to dateFormat.masks.default.
 #
-class dateFormatter
+class chronos.DateFormatter
 
   constructor: (settings) ->
     @i18n =

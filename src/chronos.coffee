@@ -1,5 +1,5 @@
 # This Class is responsible for managing the various datepickers that may be instantiated.
-class Chronos
+class chronos.Chronos
 
   constructor: () ->
     @current = {}
@@ -27,7 +27,8 @@ class Chronos
     pmAbbrLower: 'p'
     pmAbbrUpper: 'P'
     startBlank: false
-    displayFormat: 'isoDate'
+    displayFormat: 'default'
+    timePicker: true
     valueFormat: 'U'
     debug: false
 
@@ -51,20 +52,22 @@ class Chronos
     Private methods
   ###
 
+  # Attach the chronos datepicker to the given input
+  # Returns chronos object
   _attach: (element, options) ->
     @current =
       settings: $.extend({}, this._defaultOptions, options);
       valueElement: element
 
-    p = new Picker(element, @current.settings)
-
     $de = @_buildDisplayElement()
-
+    @current.displayElement = $de[0]
+    @
 
   # creates a duplicate input element for display purposes
+  # Returns the display element
   _buildDisplayElement: ->
     s = @current.settings
-    df = new dateFormatter(s)
+    df = new chronos.DateFormatter(s)
     $ve = $(@current.valueElement)
     initValue = $ve.val()
 
@@ -84,8 +87,11 @@ class Chronos
       $ve.hide()
 
     $displayElement.bind
-      'focus':  (event) ->
-        alert("FOCUS!")
+      'focus':  (event) =>
+        @_onFocus(event)
+
+      'blur': (event) =>
+        @_onBlur(event)
 
     $ve.before($displayElement) # place clone before valueElement
 
@@ -95,6 +101,23 @@ class Chronos
 
     $displayElement
 
+  # Construct a date picker and render it
+  _renderPicker: ->
+    p = new chronos.Picker(@current)
+
+
+
+
   ###
     BINDINGS
   ###
+
+  # Used for focus on displayElement
+  _onFocus: (event) ->
+    @setCurrentElement(event.target)
+    @_renderPicker()
+
+  # Used for blur on displayElement
+  _onBlur: (event) ->
+    console.log "Blur!", @
+    # TODO: close picker, destroy stuff
