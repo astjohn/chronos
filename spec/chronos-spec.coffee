@@ -108,11 +108,12 @@ describe "Chronos", ->
         expect(chronos.Picker).toHaveBeenCalledWith(c.current)
 
 
-  describe "bindings", ->
+  describe "events", ->
 
     describe "#_onFocus", ->
 
       it "calls #setCurrentElement", ->
+        spyOn(c, '_renderPicker').andReturn("mock")
         c.setCurrentElement = jasmine.createSpy("setCurrentElement")
         c._onFocus({target: "some target"})
         expect(c.setCurrentElement).toHaveBeenCalledWith("some target")

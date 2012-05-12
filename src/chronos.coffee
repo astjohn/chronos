@@ -30,6 +30,11 @@ class chronos.Chronos
     displayFormat: 'default'
     timePicker: true
     valueFormat: 'U'
+    yearsPerPage: 20
+    maxDate: null
+    minDate: null
+    startDay: 0  # Sunday (0) through Saturday (6) - be aware that this may affect your
+                 # layout, since the days on the right might have a different margin
     debug: false
 
 
@@ -104,12 +109,18 @@ class chronos.Chronos
   # Construct a date picker and render it
   _renderPicker: ->
     p = new chronos.Picker(@current)
+    #p.build()
+
+    # TODO: TEMPORARY
+    p._renderMonths()
+
+    $(@current.displayElement).after(p.container)
 
 
 
 
   ###
-    BINDINGS
+    EVENT HANDLERS
   ###
 
   # Used for focus on displayElement
