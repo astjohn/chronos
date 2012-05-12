@@ -20,6 +20,7 @@ paths =
 
 paths.tmpSrc = path.join paths.tmp, 'src'
 paths.tmpSpec = path.join paths.tmp, 'spec'
+paths.srcScss = path.join paths.src, 'scss'
 
 # Create directories if they do not already exist
 for dir in [paths.build, paths.tmp]
@@ -165,6 +166,7 @@ task 'watch', 'Automatically recompile CoffeeScript files to JavaScript', ->
       process.stdout.write data.green
     else
       process.stderr.write data.red
+
 
 # task 'lint', 'Check CoffeeScript for lint', ->
 #   console.log "Checking *.coffee for lint".yellow

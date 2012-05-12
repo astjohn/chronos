@@ -116,8 +116,9 @@ class chronos.PanelMonth
       # create day div
       classes = classes.join(' ')
       day = $("<div class='#{classes}' >#{workingDate.getDate()}</div>")
-      day.click (event) =>
-        @_onDaySelect(event, workingDate)
+
+      day.click {date: new Date(workingDate.valueOf())}, (event) =>
+        @_onDaySelect(event, event.data.date)
       weekContainer.append(day)
 
       # increment day
