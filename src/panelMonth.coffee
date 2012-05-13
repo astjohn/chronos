@@ -1,13 +1,14 @@
 class chronos.PanelMonth
 
   constructor: (options) ->
-    @givenDate = new Date(options.givenDate.valueOf()) # do not mutate original
+    #do not mutate original dates
+    @givenDate = new Date(options.givenDate.valueOf()) if options.givenDate
+    @choice = new Date(options.choice) if options.choice
+    @maxDate = new Date(options.maxDate) if options.maxDate
+    @minDate = new Date(options.minDate) if options.minDate
     @month = options.month
     @startDay = options.startDay
     @dayNamesAbbr = options.dayNamesAbbr
-    @choice = options.choice
-    @maxDate = options.maxDate
-    @minDate = options.minDate
     @today = new Date()
     @container = {}
 
@@ -46,17 +47,13 @@ class chronos.PanelMonth
   # Return true if given date matches today's date
   # Given date should have time portion set to zero
   _isToday: (d) ->
-    today = new Date(@today.valueOf())
-    @_clearTimePortion(today)
-    d.toDateString() == today.toDateString()
+    d.toDateString() == @today.toDateString()
 
   # Return true if given date matches choice
   # Given date should have time portion set to zero.
   _isChoice: (d) ->
     if @choice
-      choice = new Date(@choice.valueOf())
-      @_clearTimePortion(choice)
-      d.toDateString() == choice.toDateString()
+      d.toDateString() == @choice.toDateString()
     else
       false
 
@@ -89,21 +86,13 @@ class chronos.PanelMonth
     workingDate = @_getMonthStart()
 
     # zero out time portion of dates before doing any comparisons
-    @_clearTimePortion(workingDate)
-    if @choice
-      checkChoice = new Date(@choice.valueOf()) # do not mutate original
-      @_clearTimePortion(checkChoice)
-    if @maxDate
-      @maxDate = new Date(@maxDate.valueOf()) # do not mutate original
-      @_clearTimePortion(@maxDate)
-    if @minDate
-      @minDate = new Date(@minDate.valueOf()) # do not mutate original
-      @_clearTimePortion(@minDate)
+    for item in [workingDate, @choice, @today, @maxDate, @minDate]
+      @_clearTimePortion(item) if item
 
     for d in [0..41]
       classes = ['day', 'day' + workingDate.getDay()]
       classes.push('today') if @_isToday(workingDate)
-      classes.push('selected') if @_isChoice(checkChoice)
+      classes.push('selected') if @_isChoice(workingDate)
       classes.push('otherMonth') unless @_isMonth(workingDate)
       classes.push('unavailable') unless @_isAvailable(workingDate)
 

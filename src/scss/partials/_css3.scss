@@ -1,0 +1,60 @@
+// CSS3 PROPERTIES
+// --------------------------------------------------
+
+// Border Radius
+@mixin border-radius($radius: 5px) {
+  -webkit-border-radius: $radius;
+     -moz-border-radius: $radius;
+          border-radius: $radius;
+}
+
+// Drop shadows
+@mixin box-shadow($shadow: 0 1px 3px rgba(0,0,0,.25)) {
+  -webkit-box-shadow: $shadow;
+     -moz-box-shadow: $shadow;
+          box-shadow: $shadow;
+}
+
+// Gradients
+@mixin gradient-vertical($startColor: #555, $endColor: #333) {
+  background-color: mix($startColor, $endColor, 60%);
+  background-image: -moz-linear-gradient(top, $startColor, $endColor); // FF 3.6+
+  background-image: -ms-linear-gradient(top, $startColor, $endColor); // IE10
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from($startColor), to($endColor)); // Safari 4+, Chrome 2+
+  background-image: -webkit-linear-gradient(top, $startColor, $endColor); // Safari 5.1+, Chrome 10+
+  background-image: -o-linear-gradient(top, $startColor, $endColor); // Opera 11.10
+  background-image: linear-gradient(top, $startColor, $endColor); // The standard
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=$startColor, endColorstr=$endColor, GradientType=0); // IE9 and down
+}
+
+//// Transitions
+//@mixin transition($transition) {
+//  -webkit-transition: $transition;
+//     -moz-transition: $transition;
+//      -ms-transition: $transition;
+//       -o-transition: $transition;
+//          transition: $transition;
+//}
+
+//// Opacity
+//@mixin opacity($opacity: 100) {
+//  opacity: $opacity / 100;
+//   filter: "alpha(opacity=#{$opacity})";
+//}
+
+//// Background sizing
+//@mixin background-size($size) {
+//  -webkit-background-size: $size;
+//     -moz-background-size: $size;
+//       -o-background-size: $size;
+//          background-size: $size;
+//}
+
+//// Box sizing
+//@mixin box-sizing($boxmodel) {
+//  -webkit-box-sizing: $boxmodel;
+//     -moz-box-sizing: $boxmodel;
+//      -ms-box-sizing: $boxmodel;
+//          box-sizing: $boxmodel;
+//}

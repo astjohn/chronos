@@ -2,3 +2,4 @@
 *.sublime-workspace
 tmp
 node_modules
+.sass-cache

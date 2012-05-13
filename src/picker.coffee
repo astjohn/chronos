@@ -57,10 +57,6 @@ class chronos.Picker
       @_onNext(event)
     )
 
-    header.append($('<div class="close">x</div>').click (event) =>
-      @_onClose(event)
-    )
-
     header
 
   # returns the main body div for the picker
@@ -108,7 +104,7 @@ class chronos.Picker
       month: @workingDate.getMonth()
       startDay: @current.options.startDay
       dayNamesAbbr: @current.options.dayNamesAbbr
-      choice: undefined # TODO
+      choice: new Date("2012-05-16") # TODO
       maxDate: undefined # TODO
       minDate: undefined # TODO
     )

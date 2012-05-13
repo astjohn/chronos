@@ -10,7 +10,7 @@ class chronos.Chronos
 
 
   @_defaultOptions:
-    pickerClass: 'blue'
+    pickerClass: ''
 
     dayNames: [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sunday",
                 "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ]

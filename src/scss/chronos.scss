@@ -1,0 +1,125 @@
+@import "partials/css3";
+
+// Variables
+$day_width: 30px;
+$selector_width: 25px; // next and previous
+$header_padding_sides: 10px;
+$header_padding_vert: 5px;
+$body_padding: 0px 5px 5px 5px;
+$day_padding: 2px;
+$border_radius: 10px;
+$border_radius_day: 5px;
+
+$calendar_width: 7*$day_width + 2*7*$day_padding + 10px; // 10px = 5px *2 from body_padding
+// padding on left and right for previous and next
+$header_title_width: $calendar_width - 2*$selector_width - 2*$header_padding_sides;
+
+
+// Colors
+$colorWhite:      #FFF;
+$colorBase:       #3DACFF;
+$colorText:       black;
+$colorOtherMonth: #E1DBFF;
+
+.chronos_picker {
+  width: $calendar_width;
+  background-color: $colorBase;
+  color: $colorText;
+  @include border-radius($border_radius);
+
+  .body {
+    padding: $body_padding;
+  }
+
+  /**
+   * HEADER
+   */
+  .header {
+    font-weight: bold;
+
+    .title {
+      width: $header_title_width;
+      text-align: center;
+    }
+    .title, .previous, .next {
+      display: inline-block;
+      cursor: pointer;
+      @include box-shadow();
+      @include gradient-vertical($colorBase, darken($colorBase, 30%));
+      text-shadow: 0 1px 0 rgba(150,150,150,.8);
+      &:hover {
+        color: $colorWhite;
+        background-color: darken($colorBase, 60%);
+        text-shadow: none;
+        @include gradient-vertical(darken($colorBase, 30%), darken($colorBase, 60%));
+      }
+    }
+  }
+  .previous, .title, .next {
+    display: inline-block;
+    padding: $header_padding_vert $header_padding_sides;
+  }
+  .next, .previous {
+    width: $selector_width;
+  }
+  .previous {
+    float: left;
+    padding-right: 0px;
+    -webkit-border-top-left-radius: $border_radius;
+    -webkit-border-bottom-left-radius: $border_radius;
+    -moz-border-radius-topleft: $border_radius;
+    -moz-border-radius-bottomleft: $border_radius;
+    border-top-left-radius: $border_radius;
+    border-bottom-left-radius: $border_radius;
+  }
+  .next {
+    float: right;
+    text-align: right;
+    padding-left: 0px;
+    -webkit-border-top-right-radius: $border_radius;
+    -webkit-border-bottom-right-radius: $border_radius;
+    -moz-border-radius-topright: $border_radius;
+    -moz-border-radius-bottomright: $border_radius;
+    border-top-right-radius: $border_radius;
+    border-bottom-right-radius: $border_radius;
+  }
+  .title {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+
+
+  /**
+   * MONTH
+   */
+  .monthBody {
+    .day {
+      @include border-radius($border_radius_day);
+      cursor: pointer;
+      &:hover, &.selected {
+        background-color: darken($colorBase, 40%);
+        color: $colorWhite;
+      }
+      &.otherMonth {
+        color: $colorOtherMonth;
+      }
+      &.today {
+        color: white;
+        font-weight: bold;
+      }
+    }
+  }
+  .monthHeader {
+    font-weight: bold;
+  }
+
+  /**
+   * COMMON
+   */
+  .day {
+    width: $day_width;
+    text-align: center;
+    display: inline-block;
+    padding: $day_padding;
+  }
+}

@@ -61,7 +61,7 @@ describe "Picker", ->
         c = p._createHeader()
         expect(c.hide()).toBeTruthy() # duck type
 
-      for klass in ["previous", "title", "next", "close"]
+      for klass in ["previous", "title", "next"]
         it "should contain a #{klass} div", ->
           c = p._createHeader()
           expect(c.find(".#{klass}").length).toBeGreaterThan(0)

@@ -1,0 +1,99 @@
+.chronos_picker {
+  width: 248px;
+  background-color: #3dacff;
+  color: black;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  /**
+   * HEADER
+   */
+  /**
+   * MONTH
+   */
+  /**
+   * COMMON
+   */ }
+  .chronos_picker .body {
+    padding: 0px 5px 5px 5px; }
+  .chronos_picker .header {
+    font-weight: bold; }
+    .chronos_picker .header .title {
+      width: 178px;
+      text-align: center; }
+    .chronos_picker .header .title, .chronos_picker .header .previous, .chronos_picker .header .next {
+      display: inline-block;
+      cursor: pointer;
+      -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+      -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+      background-color: #248cda;
+      background-image: -moz-linear-gradient(top, #3dacff, #005da3);
+      background-image: -ms-linear-gradient(top, #3dacff, #005da3);
+      background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#3dacff), to(#005da3));
+      background-image: -webkit-linear-gradient(top, #3dacff, #005da3);
+      background-image: -o-linear-gradient(top, #3dacff, #005da3);
+      background-image: linear-gradient(top, #3dacff, #005da3);
+      background-repeat: repeat-x;
+      filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=$startColor, endColorstr=$endColor, GradientType=0);
+      text-shadow: 0 1px 0 rgba(150, 150, 150, 0.8); }
+      .chronos_picker .header .title:hover, .chronos_picker .header .previous:hover, .chronos_picker .header .next:hover {
+        color: white;
+        background-color: #00060a;
+        text-shadow: none;
+        background-color: #003a65;
+        background-image: -moz-linear-gradient(top, #005da3, #00060a);
+        background-image: -ms-linear-gradient(top, #005da3, #00060a);
+        background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#005da3), to(#00060a));
+        background-image: -webkit-linear-gradient(top, #005da3, #00060a);
+        background-image: -o-linear-gradient(top, #005da3, #00060a);
+        background-image: linear-gradient(top, #005da3, #00060a);
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=$startColor, endColorstr=$endColor, GradientType=0); }
+  .chronos_picker .previous, .chronos_picker .title, .chronos_picker .next {
+    display: inline-block;
+    padding: 5px 10px; }
+  .chronos_picker .next, .chronos_picker .previous {
+    width: 25px; }
+  .chronos_picker .previous {
+    float: left;
+    padding-right: 0px;
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-bottom-left-radius: 10px;
+    -moz-border-radius-topleft: 10px;
+    -moz-border-radius-bottomleft: 10px;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px; }
+  .chronos_picker .next {
+    float: right;
+    text-align: right;
+    padding-left: 0px;
+    -webkit-border-top-right-radius: 10px;
+    -webkit-border-bottom-right-radius: 10px;
+    -moz-border-radius-topright: 10px;
+    -moz-border-radius-bottomright: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px; }
+  .chronos_picker .title {
+    padding-left: 0px;
+    padding-right: 0px; }
+  .chronos_picker .monthBody .day {
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    cursor: pointer; }
+    .chronos_picker .monthBody .day:hover, .chronos_picker .monthBody .day.selected {
+      background-color: #004070;
+      color: white; }
+    .chronos_picker .monthBody .day.otherMonth {
+      color: #e1dbff; }
+    .chronos_picker .monthBody .day.today {
+      color: white;
+      font-weight: bold; }
+  .chronos_picker .monthHeader {
+    font-weight: bold; }
+  .chronos_picker .day {
+    width: 30px;
+    text-align: center;
+    display: inline-block;
+    padding: 2px; }
