@@ -1,10 +1,11 @@
 .chronos_picker {
-  width: 248px;
+  width: 238px;
   background-color: #3dacff;
   color: black;
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   border-radius: 10px;
+  overflow: hidden;
   /**
    * HEADER
    */
@@ -15,11 +16,17 @@
    * COMMON
    */ }
   .chronos_picker .body {
-    padding: 0px 5px 5px 5px; }
+    width: 714px;
+    position: relative;
+    left: -238px; }
+  .chronos_picker .body_prev, .chronos_picker .body_curr, .chronos_picker .body_next {
+    width: 238px;
+    float: left;
+    position: relative; }
   .chronos_picker .header {
     font-weight: bold; }
     .chronos_picker .header .title {
-      width: 178px;
+      width: 168px;
       text-align: center; }
     .chronos_picker .header .title, .chronos_picker .header .previous, .chronos_picker .header .next {
       display: inline-block;
@@ -82,14 +89,14 @@
     -moz-border-radius: 5px;
     border-radius: 5px;
     cursor: pointer; }
+    .chronos_picker .monthBody .day.today {
+      color: white;
+      font-weight: bold; }
     .chronos_picker .monthBody .day:hover, .chronos_picker .monthBody .day.selected {
       background-color: #004070;
       color: white; }
     .chronos_picker .monthBody .day.otherMonth {
       color: #e1dbff; }
-    .chronos_picker .monthBody .day.today {
-      color: white;
-      font-weight: bold; }
   .chronos_picker .monthHeader {
     font-weight: bold; }
   .chronos_picker .day {

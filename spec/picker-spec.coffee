@@ -45,7 +45,7 @@ describe "Picker", ->
         expect(c.hasClass('blue')).toBeTruthy
 
 
-    describe "#_createHeader", ->
+    describe "#_createBody", ->
       it "should create a jquery container div", ->
         c = p._createBody()
         expect(c.hide()).toBeTruthy() # duck type
@@ -56,7 +56,7 @@ describe "Picker", ->
           expect(c.find(".#{klass}").length).toBeGreaterThan(0)
 
 
-    describe "#_createBody", ->
+    describe "#_createHeader", ->
       it "should create a jquery container div", ->
         c = p._createHeader()
         expect(c.hide()).toBeTruthy() # duck type
@@ -66,6 +66,24 @@ describe "Picker", ->
           c = p._createHeader()
           expect(c.find(".#{klass}").length).toBeGreaterThan(0)
 
+      it "should handle previous click events", ->
+        spyOn(p, '_onPrevious')
+        c = p._createHeader()
+        c.find(".previous").click()
+        expect(p._onPrevious).toHaveBeenCalled()
+
+      it "should handle next click events", ->
+        spyOn(p, '_onNext')
+        c = p._createHeader()
+        c.find(".next").click()
+        expect(p._onNext).toHaveBeenCalled()
+
+      it "should handle zoom (title bar) click events", ->
+        spyOn(p, '_onZoomOut')
+        c = p._createHeader()
+        c.find(".title").click()
+        expect(p._onZoomOut).toHaveBeenCalled()
+
 
     describe "#_initialize", ->
 
@@ -74,10 +92,10 @@ describe "Picker", ->
         p.constructor(current)
         expect(p._initializeContainer).toHaveBeenCalled()
 
-      it "should call _setWorkingDate", ->
-        p._setWorkingDate = jasmine.createSpy("_setWorkingDate")
+      it "should call _setStartingDate", ->
+        p._setStartingDate = jasmine.createSpy("_setStartingDate")
         p.constructor(current)
-        expect(p._setWorkingDate).toHaveBeenCalled()
+        expect(p._setStartingDate).toHaveBeenCalled()
 
       it "should set the container", ->
         expect(p.container.find(".body").length).toBeGreaterThan(0) # duck type
@@ -95,48 +113,48 @@ describe "Picker", ->
         p._renderTitle("HI")
         expect(p.container.find(".titleText").html()).toEqual("HI")
 
-    describe "#_setWorkingDate", ->
-      console.log "SWD"
+
+    describe "#_setStartingDate", ->
       beforeEach ->
         p.current.options.minDate = null
         p.current.options.maxDate = null
-        p.workingDate = undefined
+        p.startingDate = undefined
 
       describe "when no maxDate or minDate", ->
-        it "sets the workingDate to the @dateToday value", ->
-          p._setWorkingDate()
-          expect(p.workingDate.valueOf()).toEqual(p.todayDate.valueOf())
+        it "sets the startingDate to the @dateToday value", ->
+          p._setStartingDate()
+          expect(p.startingDate.valueOf()).toEqual(p.todayDate.valueOf())
 
       describe "when given a minDate", ->
 
-        it "sets the workingDate to the minDate if @todayDate is before the minDate", ->
+        it "sets the startingDate to the minDate if @todayDate is before the minDate", ->
           min = new Date("2012-06-10")
           p.todayDate = new Date("2012-06-5")
           p.current.options.minDate = min
-          p._setWorkingDate()
-          expect(p.workingDate.valueOf()).toEqual(min.valueOf())
+          p._setStartingDate()
+          expect(p.startingDate.valueOf()).toEqual(min.valueOf())
 
-        it "does not set the workingDate if @todayDate is after the minDate", ->
+        it "does not set the startingDate if @todayDate is after the minDate", ->
           today = new Date("2012-06-15")
           p.current.options.minDate = new Date("2012-06-10")
           p.todayDate = today
-          p._setWorkingDate()
-          expect(p.workingDate.valueOf()).toEqual(today.valueOf())
+          p._setStartingDate()
+          expect(p.startingDate.valueOf()).toEqual(today.valueOf())
 
       describe "when given a maxDate", ->
-        it "sets the workingDate to the maxDate if @todayDate is after the maxDate", ->
+        it "sets the startingDate to the maxDate if @todayDate is after the maxDate", ->
           max = new Date("2012-06-10")
           p.todayDate = new Date("2012-06-15")
           p.current.options.maxDate = max
-          p._setWorkingDate()
-          expect(p.workingDate.valueOf()).toEqual(max.valueOf())
+          p._setStartingDate()
+          expect(p.startingDate.valueOf()).toEqual(max.valueOf())
 
-        it "does not set the workingDate if @todayDate is before the maxDate", ->
+        it "does not set the startingDate if @todayDate is before the maxDate", ->
           today = new Date("2012-06-15")
           p.current.options.maxDate = new Date("2012-06-20")
           p.todayDate = today
-          p._setWorkingDate()
-          expect(p.workingDate.valueOf()).toEqual(today.valueOf())
+          p._setStartingDate()
+          expect(p.startingDate.valueOf()).toEqual(today.valueOf())
 
       describe "when given both a minDate and a maxDate", ->
         it "will default to the minDate", ->
@@ -144,8 +162,8 @@ describe "Picker", ->
           p.todayDate = new Date("2012-06-5")
           p.current.options.minDate = min
           p.current.options.maxDate = new Date("2012-06-20")
-          p._setWorkingDate()
-          expect(p.workingDate.valueOf()).toEqual(min.valueOf())
+          p._setStartingDate()
+          expect(p.startingDate.valueOf()).toEqual(min.valueOf())
 
 
     describe "#_renderYears", ->
@@ -158,5 +176,72 @@ describe "Picker", ->
 
 
     describe "#_renderMonths", ->
-      pending
+      d = {}
+      $container = {}
+
+      beforeEach ->
+        d = new Date("2012-05-10")
+        p.startingDate = d
+
+      it "should set the title for @startingDate", ->
+        p._renderMonths()
+        month = d.getMonth()
+        text = "#{p.current.options.monthNames[month+12]} #{d.getFullYear()}"
+        title = p.container.find(".titleText").html()
+        expect(title).toEqual(text)
+
+      it "should set the .body_curr div for @startingDate", ->
+        p._renderMonths()
+        test = p.container.find(".body_curr").find(".monthBody").attr('data-date')
+        given = String(d.valueOf())
+        expect(test).toEqual(given)
+
+      it "should set the .body_prev div for the previous month", ->
+        p._renderMonths()
+        test = p.container.find(".body_prev").find(".monthBody").attr('data-date')
+        previous = new Date(d.setMonth(d.getMonth() - 1))
+        given = String(previous.valueOf())
+        expect(test).toEqual(given)
+
+      it "should set the .body_next div for the next month", ->
+        p._renderMonths()
+        test = p.container.find(".body_next").find(".monthBody").attr('data-date')
+        previous = new Date(d.setMonth(d.getMonth() + 1))
+        given = String(previous.valueOf())
+        expect(test).toEqual(given)
+
+
+    describe "#_buildMonth", ->
+      d = new Date()
+      $container = $("<div />")
+
+      it "should add a month panel to the given container", ->
+        p._buildMonth(d, $container)
+        expect($container.find(".monthPanel").length).toEqual(1)
+
+      it "should handle day click events", ->
+        spyOn(p, '_onDaySelect')
+        $test = p._buildMonth(d, $container)
+        $day = $test.find(".monthBody").find(".week0").find(".day0")
+        $day.click()
+        expect(p._onDaySelect).toHaveBeenCalled()
+
+    describe "#_changeMonthBy", ->
+      d = {}
+      beforeEach ->
+        d = new Date()
+
+      it "returns a date object", ->
+        expect(p._changeMonthBy(d, 0).valueOf()).toBeTruthy() # duck type
+
+      it "can decrease the given date by given months", ->
+        test = new Date(d.valueOf())
+        test.setMonth(d.getMonth() - 2)
+        expect(p._changeMonthBy(d, -2).valueOf()).toEqual(test.valueOf())
+
+      it "can increase the given date by given months", ->
+        test = new Date(d.valueOf())
+        test.setMonth(d.getMonth() + 5)
+        expect(p._changeMonthBy(d, 5).valueOf()).toEqual(test.valueOf())
+
 

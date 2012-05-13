@@ -1,10 +1,13 @@
-describe "Picker", ->
+describe "PanelMonth", ->
   givenDate = new Date("2012-05-12")
   options =
     month: givenDate.getMonth()
     givenDate: givenDate
     startDay: 0 # Sunday
     dayNamesAbbr: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
+    monthNames: [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
+                  "Nov", "Dec", "January", "February", "March", "April", "May", "June",
+                  "July", "August", "September", "October", "November", "December" ]
   p = {}
 
   beforeEach ->
@@ -12,8 +15,6 @@ describe "Picker", ->
 
   describe "public methods", ->
     describe "#contructor:", ->
-      it "sets @month", ->
-        expect(p.month).toEqual(options.month)
 
       it "sets @givenDate", ->
         expect(p.givenDate.valueOf()).toEqual(options.givenDate.valueOf())
@@ -26,6 +27,9 @@ describe "Picker", ->
 
       it "sets @dayNamesAbbr", ->
         expect(p.dayNamesAbbr).toEqual(options.dayNamesAbbr)
+
+      it "sets @monthNames", ->
+        expect(p.monthNames).toEqual(options.monthNames)
 
 
     describe "#render", ->
@@ -212,6 +216,13 @@ describe "Picker", ->
           expect(p._isAvailable(d)).toEqual(false)
 
 
+    describe "#_getMonthTitle", ->
+      it "returns a string representing the givenDate's month and year", ->
+        # "#{@monthNames[@givenDate.getMonth()+12]} #{@givenDate.getFullYear()}"
+        test = "May 2012"
+        expect(p._getMonthTitle()).toEqual(test)
+
+
     describe "#_getMonthDays", ->
       it "returns a jquery element", ->
         expect(p._getMonthDays().hide()).toBeTruthy() # duck type
@@ -226,16 +237,39 @@ describe "Picker", ->
         days = p._getMonthDays().find(".week").children()
         expect(days.length).toEqual(42)
 
+      it "adds a data-date element so external sources know what
+          the panel represents", ->
+        # givenDate = new Date("2012-05-12")
+        # $("<div class='monthBody' data-date='#{@givenDate.valueOf()}' />")
+        $panel = p._getMonthDays()
+        match = String(p.givenDate.valueOf())
+        expect($panel.attr('data-date')).toEqual(match)
+
+      it "adds the month's title for external sources to handle", ->
+        $panel = p._getMonthDays()
+        month = p.givenDate.getMonth()
+        year = p.givenDate.getFullYear()
+        match = "#{p.monthNames[month+12]} #{year}"
+        expect($panel.attr('data-date_title')).toEqual(match)
+
+      it "should handle day click events", ->
+        spyOn(p, '_onDaySelect')
+        $panel = p._getMonthDays()
+        $day = $panel.find(".week0").find(".day0")
+        $day.click()
+        expect(p._onDaySelect).toHaveBeenCalled()
+
 
     describe "events", ->
       describe "#_onDaySelect", ->
-        p = new chronos.PanelMonth(options)
-        p.container = {}
-        p.container.trigger = jasmine.createSpy("container")
-        mock_event = {target: "mock target element"}
-        p._onDaySelect(mock_event, "date")
-        expect(p.container.trigger).toHaveBeenCalledWith('daySelect',
-          ['mock target element', 'date'])
+        it "triggers the 'daySelect' event", ->
+          p = new chronos.PanelMonth(options)
+          p.container = {}
+          p.container.trigger = jasmine.createSpy("container")
+          mock_event = {target: "mock target element"}
+          p._onDaySelect(mock_event, "date")
+          expect(p.container.trigger).toHaveBeenCalledWith('daySelect',
+            ['mock target element', 'date'])
 
 
 

@@ -1,11 +1,11 @@
 class chronos.Picker
 
   constructor: (current) ->
-    @current = current
-    @container = undefined
-    @workingDate = undefined
-    @todayDate = new Date()
-    #@pickedDate = new Date()
+    @current = current # to reference and save picker's settings
+    @container = undefined # to hold the picker
+    @startingDate = undefined # the start date to show
+    @todayDate = new Date() # for today
+    @pickedDateTime = undefined
 
     @_initialize()
 
@@ -25,7 +25,7 @@ class chronos.Picker
 
   _initialize: ->
     @container ||= @_initializeContainer()
-    @_setWorkingDate()
+    @_setStartingDate()
 
   _initializeContainer: ->
     @container = @_createContainer()
@@ -95,75 +95,56 @@ class chronos.Picker
 
   # fill the picker's body with a range of months to select from
   _renderMonths: ->
-    month = @workingDate.getMonth()
+    month = @startingDate.getMonth()
     # add 12 to month names to get full name
-    @_renderTitle("#{@current.options.monthNames[month+12]} #{@workingDate.getFullYear()}")
+    @_buildMonth(@startingDate, @container.find(".body_curr"))
 
-    currentMonthPanel = new chronos.PanelMonth(
-      givenDate: @workingDate
-      month: @workingDate.getMonth()
+    # set title to current month
+    @_renderTitle(@container.find(".body_curr").find(".monthBody").attr('data-date_title'))
+
+    @_buildMonth(@_changeMonthBy(@startingDate, -1), @container.find(".body_prev"))
+
+    @_buildMonth(@_changeMonthBy(@startingDate, 1), @container.find(".body_next"))
+
+  # create a month panel according to given date and append it to given container
+  _buildMonth: (showDate, $container) ->
+    monthPanel = new chronos.PanelMonth(
+      givenDate: showDate
       startDay: @current.options.startDay
       dayNamesAbbr: @current.options.dayNamesAbbr
-      choice: new Date("2012-05-16") # TODO
+      monthNames: @current.options.monthNames
+      choice: @pickedDateTime #new Date("2012-05-16") # TODO
       maxDate: undefined # TODO
       minDate: undefined # TODO
     )
-
-    currentMonth = currentMonthPanel.render()
-
+    month = monthPanel.render()
     # handle day selection
-    currentMonth.bind 'daySelect', (event, dayElement, date) =>
+    month.bind 'daySelect', (event, dayElement, date) =>
       @_onDaySelect(event, dayElement, date)
+    $container.append(month)
 
-    @container.find(".body_curr").append(currentMonth)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  # Increment or decrement given date by given value in months
+  _changeMonthBy: (date, value) ->
+    d = new Date(date.valueOf())
+    d.setMonth(d.getMonth() + value)
+    d
 
   # sets the picker's working date
-  _setWorkingDate: ->
+  _setStartingDate: ->
     if @current.options.maxDate != null || @current.options.minDate != null
-
 
       # if today is past the max date, then set the working date to the max
       if @current.options.maxDate && (@todayDate.valueOf() > @current.options.maxDate.valueOf())
-        @workingDate = new Date(@current.options.maxDate.valueOf())
+        @startingDate = new Date(@current.options.maxDate.valueOf())
 
       # if today is before the min date, then set the working date to the min
       if @current.options.minDate && (@todayDate.valueOf() < @current.options.minDate.valueOf())
-        @workingDate = new Date(@current.options.minDate.valueOf())
+        @startingDate = new Date(@current.options.minDate.valueOf())
 
     # set the working date to today (but a separate object) if still undefined
-    if @workingDate == undefined
-      @workingDate = new Date(@todayDate.valueOf())
-    @workingDate
+    if @startingDate == undefined
+      @startingDate = new Date(@todayDate.valueOf())
+    @startingDate
 
 
   ###
@@ -174,13 +155,99 @@ class chronos.Picker
     console.log ("ZOOM!")
 
   _onPrevious: (event) ->
+    console.log ("previous!")
+    unless @animating # prevent spastic clicks
+      @animating = true
+      $container = $(event.target).parent().parent(".chronos_picker")
+      $body = $container.find(".body")
+
+      $next = $body.find(".body_next")
+      $curr = $body.find(".body_curr")
+      $prev = $body.find(".body_prev")
+      width = $curr.outerWidth()
+
+      # set title to new month
+      @_renderTitle($prev.find(".monthBody").attr('data-date_title'))
+
+      # TODO: abstract animation options
+
+      $curr.animate {
+        left: "+=#{width}"
+      }, 500
+      $prev.animate {
+        left: "+=#{width}"
+      }, 500, =>
+        # when finished:
+        #  - remove next
+        #  - set current to next
+        #  - set prev to current
+        #  - build new MonthPanel for prev
+        $next.remove()
+        $curr.removeClass("body_curr").addClass("body_next")
+        $prev.removeClass("body_prev").addClass("body_curr")
+        $new_prev = $("<div class='body_prev' />")
+        $body.prepend($new_prev)
+
+        $curr.removeAttr('style')
+        $prev.removeAttr('style')
+        $next.removeAttr('style')
+
+        newCurrentDate = new Date(parseInt($prev.find(".monthBody").attr('data-date')))
+        @_buildMonth(@_changeMonthBy(newCurrentDate, -1), $new_prev)
+        @animating = false
+
+
+
 
   _onNext: (event) ->
+    console.log ("next!")
+    unless @animating # prevent spastic clicks
+      @animating = true
+      $container = $(event.target).parent().parent(".chronos_picker")
+      $body = $container.find(".body")
+
+      $next = $body.find(".body_next")
+      $curr = $body.find(".body_curr")
+      $prev = $body.find(".body_prev")
+      width = $curr.outerWidth()
+
+      # set title to new month
+      @_renderTitle($next.find(".monthBody").attr('data-date_title'))
+
+      # TODO: abstract animation options
+
+      $curr.animate {
+        left: "-=#{width}"
+      }, 500
+      $next.animate {
+        left: "-=#{width}"
+      }, 500, =>
+        # when finished:
+        #  - remove prev
+        #  - set current to prev
+        #  - set next to current
+        #  - build new MonthPanel for next
+        $prev.remove()
+        $curr.removeClass("body_curr").addClass("body_prev")
+        $next.removeClass("body_next").addClass("body_curr")
+        $new_next = $("<div class='body_next' />")
+        $body.append($new_next)
+
+        $curr.removeAttr('style')
+        $prev.removeAttr('style')
+        $next.removeAttr('style')
+
+        newCurrentDate = new Date(parseInt($next.find(".monthBody").attr('data-date')))
+        @_buildMonth(@_changeMonthBy(newCurrentDate, 1), $new_next)
+        @animating = false
 
   _onClose: (event) ->
+    console.log ("close!")
+
 
   _onDaySelect: (event, dayElement, date) ->
     console.log "SELECTED", event, dayElement, date
+    #@pickedDateTime = date
 
 
 

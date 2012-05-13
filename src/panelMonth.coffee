@@ -6,9 +6,9 @@ class chronos.PanelMonth
     @choice = new Date(options.choice) if options.choice
     @maxDate = new Date(options.maxDate) if options.maxDate
     @minDate = new Date(options.minDate) if options.minDate
-    @month = options.month
     @startDay = options.startDay
     @dayNamesAbbr = options.dayNamesAbbr
+    @monthNames = options.monthNames
     @today = new Date()
     @container = {}
 
@@ -17,6 +17,7 @@ class chronos.PanelMonth
     @container.append(@_getMonthHeader.call(@))
     @container.append(@_getMonthDays.call(@))
     @container
+
 
   ###
     Private Methods
@@ -57,9 +58,9 @@ class chronos.PanelMonth
     else
       false
 
-  # Return true if given date matches @month
+  # Return true if given date matches the given month
   _isMonth: (d) ->
-    @month == d.getMonth()
+    @givenDate.getMonth() == d.getMonth()
 
   # Return true if date is available according to maxDate and minDate
   # maxDate and minDate are inclusive and have already had their time portions zeroed
@@ -80,14 +81,22 @@ class chronos.PanelMonth
     d.setMilliseconds(0)
     d
 
+  _getMonthTitle: ->
+    "#{@monthNames[@givenDate.getMonth()+12]} #{@givenDate.getFullYear()}"
+
   # build the month days
   _getMonthDays: ->
-    days = $("<div class='monthBody' />")
+    # zero out time portion of dates before doing any comparisons
+    for item in [@givenDate, @choice, @today, @maxDate, @minDate]
+      @_clearTimePortion(item) if item
+
     workingDate = @_getMonthStart()
 
-    # zero out time portion of dates before doing any comparisons
-    for item in [workingDate, @choice, @today, @maxDate, @minDate]
-      @_clearTimePortion(item) if item
+    # here we store the month's workingDate so that we can figure out what month
+    # the panel represents from an external source
+    days = $("<div class='monthBody'
+                   data-date='#{@givenDate.valueOf()}'
+                   data-date_title='#{@_getMonthTitle()}' />")
 
     for d in [0..41]
       classes = ['day', 'day' + workingDate.getDay()]
@@ -115,10 +124,13 @@ class chronos.PanelMonth
 
     days
 
+
+  ###
+    Events
+  ###
+
   # Fire daySelect
   _onDaySelect: (event, date) ->
-    @container.trigger('daySelect', [event.target, date])
-
-
-
+    $target = $(event.target)
+    @container.trigger('daySelect', [event.target, date]) unless $target.hasClass("unavailable")
 
