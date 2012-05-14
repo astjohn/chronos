@@ -100,6 +100,9 @@ describe "Picker", ->
       it "should set the container", ->
         expect(p.container.find(".body").length).toBeGreaterThan(0) # duck type
 
+      it "creates a new animator", ->
+        expect(p.animator).toBeTruthy()
+
 
     describe "#_initializeContainer", ->
       it "should call _createContainer", ->
@@ -180,35 +183,23 @@ describe "Picker", ->
       $container = {}
 
       beforeEach ->
-        d = new Date("2012-05-10")
+        d = new Date("2012-05-10 00:00:00")
         p.startingDate = d
 
-      it "should set the title for @startingDate", ->
+      it "should build the current month", ->
         p._renderMonths()
-        month = d.getMonth()
-        text = "#{p.current.options.monthNames[month+12]} #{d.getFullYear()}"
-        title = p.container.find(".titleText").html()
-        expect(title).toEqual(text)
+        c = p.container.find(".body_curr").find(".monthBody").attr("data-date_title")
+        expect(c).toEqual("May 2012")
 
-      it "should set the .body_curr div for @startingDate", ->
+      it "should build the previous month", ->
         p._renderMonths()
-        test = p.container.find(".body_curr").find(".monthBody").attr('data-date')
-        given = String(d.valueOf())
-        expect(test).toEqual(given)
+        c = p.container.find(".body_prev").find(".monthBody").attr("data-date_title")
+        expect(c).toEqual("April 2012")
 
-      it "should set the .body_prev div for the previous month", ->
+      it "should build the next month", ->
         p._renderMonths()
-        test = p.container.find(".body_prev").find(".monthBody").attr('data-date')
-        previous = new Date(d.setMonth(d.getMonth() - 1))
-        given = String(previous.valueOf())
-        expect(test).toEqual(given)
-
-      it "should set the .body_next div for the next month", ->
-        p._renderMonths()
-        test = p.container.find(".body_next").find(".monthBody").attr('data-date')
-        previous = new Date(d.setMonth(d.getMonth() + 1))
-        given = String(previous.valueOf())
-        expect(test).toEqual(given)
+        c = p.container.find(".body_next").find(".monthBody").attr("data-date_title")
+        expect(c).toEqual("June 2012")
 
 
     describe "#_buildMonth", ->
@@ -225,6 +216,7 @@ describe "Picker", ->
         $day = $test.find(".monthBody").find(".week0").find(".day0")
         $day.click()
         expect(p._onDaySelect).toHaveBeenCalled()
+
 
     describe "#_changeMonthBy", ->
       d = {}
@@ -243,5 +235,40 @@ describe "Picker", ->
         test = new Date(d.valueOf())
         test.setMonth(d.getMonth() + 5)
         expect(p._changeMonthBy(d, 5).valueOf()).toEqual(test.valueOf())
+
+
+    describe "events", ->
+      event = {}
+      beforeEach ->
+        event = {target: "mock"}
+        spyOn(event, 'target')
+
+      describe "_onPrevious", ->
+        it "should tell the animator which picker to use", ->
+          spyOn(p.animator, 'setPicker')
+          spyOn(p.animator, 'previousMonth')
+          p._onPrevious(event)
+          expect(p.animator.setPicker).toHaveBeenCalled()
+
+        it "should animate the previous month action", ->
+          spyOn(p.animator, 'setPicker')
+          spyOn(p.animator, 'previousMonth')
+          p._onPrevious(event)
+          expect(p.animator.previousMonth).toHaveBeenCalled()
+
+      describe "_onNext", ->
+        it "should tell the animator which picker to use", ->
+          spyOn(p.animator, 'setPicker')
+          spyOn(p.animator, 'nextMonth')
+          p._onNext(event)
+          expect(p.animator.setPicker).toHaveBeenCalled()
+
+        it "should animate the previous month action", ->
+          spyOn(p.animator, 'setPicker')
+          spyOn(p.animator, 'nextMonth')
+          p._onNext(event)
+          expect(p.animator.nextMonth).toHaveBeenCalled()
+
+
 
 

@@ -35,6 +35,8 @@ class chronos.Chronos
     minDate: null
     startDay: 0  # Sunday (0) through Saturday (6) - be aware that this may affect your
                  # layout, since the days on the right might have a different margin
+
+    animations: {}
     debug: false
 
 
