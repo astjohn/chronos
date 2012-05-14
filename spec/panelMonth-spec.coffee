@@ -96,18 +96,23 @@ describe "PanelMonth", ->
 
 
     describe "#_clearTimePortion", ->
+      d = {}
+      beforeEach ->
+        d = new Date("2012-05-15 09:42:32:88")
+
       it "clears the hours portion of the given date", ->
-        d = new Date("2012-05-15 09:42:32")
         p._clearTimePortion(d)
         expect(d.getHours()).toEqual(0)
 
       it "clears the minutes portion of the given date", ->
-        d = new Date("2012-05-15 09:42:32")
         p._clearTimePortion(d)
         expect(d.getMinutes()).toEqual(0)
 
+      it "clears the seconds portion of the given date", ->
+        p._clearTimePortion(d)
+        expect(d.getSeconds()).toEqual(0)
+
       it "clears the milliseconds portion of the given date", ->
-        d = new Date("2012-05-15 09:42:32")
         p._clearTimePortion(d)
         expect(d.getMilliseconds()).toEqual(0)
 
@@ -269,7 +274,7 @@ describe "PanelMonth", ->
           mock_event = {target: "mock target element"}
           p._onDaySelect(mock_event, "date")
           expect(p.container.trigger).toHaveBeenCalledWith('daySelect',
-            ['mock target element', 'date'])
+            ['date', 'mock target element'])
 
 
 

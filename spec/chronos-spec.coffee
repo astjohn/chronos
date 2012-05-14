@@ -19,7 +19,7 @@ describe "Chronos", ->
         oldElement = $(input)
         newElement = $(input)
         newSettings = {new: "settings"}
-        $.data(newElement[0], c.PROP_NAME, newSettings)
+        $.data(newElement[0], chronos.Chronos.PROP_NAME, newSettings)
 
       it "pushes the current settings to the old list", ->
         c.current = oldSettings
@@ -98,7 +98,7 @@ describe "Chronos", ->
 
       it "persists the given element's settings using $.data and the display element", ->
         $de = c._buildDisplayElement()
-        expect($.data($de[0], c.PROP_NAME)).toBeTruthy()
+        expect($.data($de[0], chronos.Chronos.PROP_NAME)).toBeTruthy()
 
 
     describe "#_renderPicker", ->

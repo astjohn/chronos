@@ -78,6 +78,7 @@ class chronos.PanelMonth
   _clearTimePortion: (d) ->
     d.setHours(0)
     d.setMinutes(0)
+    d.setSeconds(0)
     d.setMilliseconds(0)
     d
 
@@ -132,5 +133,5 @@ class chronos.PanelMonth
   # Fire daySelect
   _onDaySelect: (event, date) ->
     $target = $(event.target)
-    @container.trigger('daySelect', [event.target, date]) unless $target.hasClass("unavailable")
+    @container.trigger('daySelect', [date, event.target]) unless $target.hasClass("unavailable")
 

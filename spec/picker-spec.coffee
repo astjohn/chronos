@@ -6,6 +6,7 @@ describe "Picker", ->
     current.options = chronos.Chronos._defaultOptions
     current.valueElement = "<input type='text' id='ve' name='ve[]' style='display: none;' />"
     current.displayElement = "<input type='text' id='ve_display' />"
+    current.pickedDateTime = undefined
     p = new chronos.Picker(current)
 
 
@@ -16,8 +17,19 @@ describe "Picker", ->
     it "should set @todayDate", ->
       expect(p.todayDate.getDate()).toBeTruthy() # duck type
 
-    # it "should set @pickedDate", ->
-    #   expect(p.pickedDate.getDate()).toBeTruthy() # duck type
+    it "should set @pickedDateTime", ->
+      current.pickedDateTime = new Date()
+      x = new chronos.Picker(current)
+      expect(x.pickedDateTime.getDate()).toBeTruthy() # duck type
+
+    it "should set the @$valueElment", ->
+      expect(p.$valueElement.hide()).toBeTruthy() # duck type
+
+    it "should set the @$displayElment", ->
+      expect(p.$displayElement.hide()).toBeTruthy() # duck type
+
+    it "should set @dateFormatter to be a new dateFormatter", ->
+      expect(p.dateFormatter.format()).toBeTruthy # duck type
 
     it "should call _initialize", ->
       p._initialize = jasmine.createSpy("_initialize")
@@ -106,9 +118,15 @@ describe "Picker", ->
 
     describe "#_initializeContainer", ->
       it "should call _createContainer", ->
+        spyOn(p, '_bindContainerEvents')
         spyOn(p, '_createContainer').andReturn($("<div class='mock' />"))
         p.constructor(current)
         expect(p._createContainer).toHaveBeenCalled()
+
+      it "should call _bindContainerEvents", ->
+        spyOn(p, '_bindContainerEvents')
+        p.constructor(current)
+        expect(p._bindContainerEvents).toHaveBeenCalled()
 
 
     describe "#_renderTitle", ->
@@ -237,13 +255,95 @@ describe "Picker", ->
         expect(p._changeMonthBy(d, 5).valueOf()).toEqual(test.valueOf())
 
 
+    describe "#_saveSettings", ->
+      it "uses jquery $.data to save settings for the displayElement", ->
+        spyOn($, 'data')
+        p._saveSettings()
+        expect($.data).toHaveBeenCalledWith(p.current.displayElement,
+          chronos.Chronos.PROP_NAME, p.current)
+
+
+    describe "#_updateInputValues", ->
+      beforeEach ->
+        spyOn(p, '_updateValueElement')
+        spyOn(p, '_updateDisplayElement')
+
+      it "updates the value element", ->
+        p._updateInputValues()
+        expect(p._updateValueElement).toHaveBeenCalled()
+
+      it "updates the display element", ->
+        p._updateInputValues()
+        expect(p._updateDisplayElement).toHaveBeenCalled()
+
+
+    describe "#_updateDisplayElement", ->
+      beforeEach ->
+        spyOn(p.dateFormatter, 'format').andReturn("a date")
+
+      describe "when a datetime has been picked", ->
+        beforeEach ->
+          p.pickedDateTime = new Date()
+
+        it "asks dateFormatter for a pretty string representation", ->
+          p._updateDisplayElement()
+          expect(p.dateFormatter.format).toHaveBeenCalledWith(p.pickedDateTime,
+            p.current.options.displayFormat)
+
+        it "changes the display elements value", ->
+          p._updateDisplayElement()
+          expect(p.$displayElement.val()).toEqual("a date")
+
+      describe "when a datetime has not been picked", ->
+        beforeEach ->
+          p.pickedDateTime = undefined
+
+        it "does not call the dateFormatter", ->
+          p._updateDisplayElement()
+          expect(p.dateFormatter.format).not.toHaveBeenCalled()
+
+        it "does not update the display element", ->
+          p._updateDisplayElement()
+          expect(p.$displayElement.val()).toEqual("")
+
+
+    describe "#_updateValueElement", ->
+      beforeEach ->
+        spyOn(p.dateFormatter, 'format').andReturn("a date")
+
+      describe "when a datetime has been picked", ->
+        beforeEach ->
+          p.pickedDateTime = new Date()
+
+        it "asks dateFormatter for a pretty string representation", ->
+          p._updateValueElement()
+          expect(p.dateFormatter.format).toHaveBeenCalledWith(p.pickedDateTime,
+            p.current.options.valueFormat)
+
+        it "changes the display elements value", ->
+          p._updateValueElement()
+          expect(p.$valueElement.val()).toEqual("a date")
+
+      describe "when a datetime has not been picked", ->
+        beforeEach ->
+          p.pickedDateTime = undefined
+
+        it "does not call the dateFormatter", ->
+          p._updateValueElement()
+          expect(p.dateFormatter.format).not.toHaveBeenCalled()
+
+        it "does not update the display element", ->
+          p._updateValuelement()
+          expect(p.$valueElement.val()).toEqual("")
+
+
     describe "events", ->
       event = {}
       beforeEach ->
         event = {target: "mock"}
         spyOn(event, 'target')
 
-      describe "_onPrevious", ->
+      describe "#_onPrevious", ->
         it "should tell the animator which picker to use", ->
           spyOn(p.animator, 'setPicker')
           spyOn(p.animator, 'previousMonth')
@@ -256,7 +356,8 @@ describe "Picker", ->
           p._onPrevious(event)
           expect(p.animator.previousMonth).toHaveBeenCalled()
 
-      describe "_onNext", ->
+
+      describe "#_onNext", ->
         it "should tell the animator which picker to use", ->
           spyOn(p.animator, 'setPicker')
           spyOn(p.animator, 'nextMonth')
@@ -268,6 +369,57 @@ describe "Picker", ->
           spyOn(p.animator, 'nextMonth')
           p._onNext(event)
           expect(p.animator.nextMonth).toHaveBeenCalled()
+
+
+      describe "#_onDaySelect", ->
+        date = new Date("2012-10-05")
+        dayElement = $('<div class="day day3">9</div>')
+        event = jasmine.createSpy("jquery event mock")
+        beforeEach ->
+          spyOn(p, '_saveSettings')
+          spyOn(p, '_updateInputValues')
+
+        describe "when not using time picker", ->
+
+          it "sets @pickedDateTime to the given date", ->
+            p._onDaySelect(event, dayElement, date)
+            expect(p.pickedDateTime).toBe(date)
+
+          it "sets @current.pickedDateTime", ->
+            p._onDaySelect(event, dayElement, date)
+            expect(p.current.pickedDateTime).toBe(date)
+
+          it "saves settings", ->
+            p._onDaySelect(event, dayElement, date)
+            expect(p._saveSettings).toHaveBeenCalled()
+
+          it "updates the inputs", ->
+            p._onDaySelect(event, dayElement, date)
+            expect(p._updateInputValues).toHaveBeenCalled()
+
+          it "fires the close event", ->
+            spyOn(p.container, 'trigger')
+            p._onDaySelect(event, dayElement, date)
+            expect(p.container.trigger).toHaveBeenCalledWith('close')
+
+        describe "when using time picker", ->
+          pending
+
+
+      describe "_passEvents", ->
+        e = {type: "mock event"}
+        e.stopPropagation = jasmine.createSpy('stop propagation mock')
+        args = "some arguments"
+
+        it "should trigger the given event on the valueElement", ->
+          p.$valueElement.trigger = jasmine.createSpy("trigger mock")
+          p._passEvents(e, args)
+          expect(p.$valueElement.trigger).toHaveBeenCalledWith(e.type, args)
+
+        it "should stop propagation", ->
+          p._passEvents(e, args)
+          expect(e.stopPropagation).toHaveBeenCalled()
+
 
 
 

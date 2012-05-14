@@ -41,7 +41,7 @@ class chronos.DateFormatter
     isoUtcDateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss'Z'"
 
   format: (date, mask, utc) ->
-    token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g
+    token = /U{1}|d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g
     timezone = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g
     timezoneClip = /[^-+\dA-Z]/g
     pad = (val, len) ->
@@ -79,6 +79,7 @@ class chronos.DateFormatter
       s = date[_ + "Seconds"]()
       L = date[_ + "Milliseconds"]()
       o = (if utc then 0 else date.getTimezoneOffset())
+      U = date.valueOf()
 
       flags =
         d: d
@@ -108,6 +109,7 @@ class chronos.DateFormatter
         Z: (if utc then "UTC" else (String(date).match(timezone) or [ "" ]).pop().replace(timezoneClip, ""))
         o: (if o > 0 then "-" else "+") + pad(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4)
         S: [ "th", "st", "nd", "rd" ][(if d % 10 > 3 then 0 else (d % 100 - d % 10 isnt 10) * d % 10)]
+        U: U
 
       mask.replace token, ($0) ->
         (if $0 of flags then flags[$0] else $0.slice(1, $0.length - 1))
