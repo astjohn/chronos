@@ -32,20 +32,16 @@ describe "Animator", ->
 
   describe "#previousMonth", ->
     describe "when given custom animations", ->
-      pmp = jasmine.createSpy("previousMonthPrepare mock")
-      pma = jasmine.createSpy("previousMonth mock")
-      pmc = jasmine.createSpy("previousMonthCallback mock")
+      animation = jasmine.createSpy("custom animation mock")
       beforeEach ->
         options =
-          previousMonthPrepare: pmp
-          previousMonth: pma
-          previousMonthCallback: pmc
+          previousMonth: animation
         a = new chronos.Animator(pm, options)
 
       it "calls animate with the correct arguments", ->
         spyOn(a, '_animate')
         a.previousMonth()
-        expect(a._animate).toHaveBeenCalledWith(pmp, pma, pmc, 'previousMonthFinished')
+        expect(a._animate).toHaveBeenCalledWith(animation, 'previousMonthFinished')
 
     describe "without custom animations", ->
       beforeEach ->
@@ -54,30 +50,23 @@ describe "Animator", ->
       it "calls animate with the defaults", ->
         spyOn(a, '_animate')
         spyOn(a, '_animatePreviousMonth')
-        spyOn(a, '_animatePreviousMonthPrepare')
-        spyOn(a, '_animatePreviousMonthCallback')
         a.previousMonth()
-        expect(a._animate).toHaveBeenCalledWith(a._animatePreviousMonthPrepare,
-          a._animatePreviousMonth, a._animatePreviousMonthCallback,
+        expect(a._animate).toHaveBeenCalledWith(a._animatePreviousMonth,
           'previousMonthFinished')
 
 
   describe "#nextMonth", ->
     describe "when given custom animations", ->
-      nmp = jasmine.createSpy("nextMonthPrepare mock")
-      nm = jasmine.createSpy("nextMonth mock")
-      nmc = jasmine.createSpy("nextMonthCallback mock")
+      animation = jasmine.createSpy('custom animation mock')
       beforeEach ->
         options =
-          nextMonthPrepare: nmp
-          nextMonth: nm
-          nextMonthCallback: nmc
+          nextMonth: animation
         a = new chronos.Animator(pm, options)
 
       it "calls animate with the correct arguments", ->
         spyOn(a, '_animate')
         a.nextMonth()
-        expect(a._animate).toHaveBeenCalledWith(nmp, nm, nmc, 'nextMonthFinished')
+        expect(a._animate).toHaveBeenCalledWith(animation, 'nextMonthFinished')
 
     describe "without custom animations", ->
       beforeEach ->
@@ -86,20 +75,38 @@ describe "Animator", ->
       it "calls animate with the defaults", ->
         spyOn(a, '_animate')
         spyOn(a, '_animateNextMonth')
-        spyOn(a, '_animateNextMonthPrepare')
-        spyOn(a, '_animateNextMonthCallback')
         a.nextMonth()
-        expect(a._animate).toHaveBeenCalledWith(a._animateNextMonthPrepare,
-          a._animateNextMonth, a._animateNextMonthCallback,
+        expect(a._animate).toHaveBeenCalledWith(a._animateNextMonth,
           'nextMonthFinished')
+
+  describe "#close", ->
+    describe "when given custom animations", ->
+      animation = jasmine.createSpy('custom animation mock')
+      beforeEach ->
+        options =
+          close: animation
+        a = new chronos.Animator(pm, options)
+
+      it "calls animate with the correct arguments", ->
+        spyOn(a, '_animate')
+        a.close()
+        expect(a._animate).toHaveBeenCalledWith(animation, 'close')
+
+    describe "without custom animations", ->
+      beforeEach ->
+        a = new chronos.Animator(pm, {})
+
+      it "calls animate with the defaults", ->
+        spyOn(a, '_animate')
+        spyOn(a, '_animateClose')
+        a.close()
+        expect(a._animate).toHaveBeenCalledWith(a._animateClose, 'close')
 
 
   describe "private methods", ->
 
     describe "_animate", ->
-      before = jasmine.createSpy("before mock")
       animation = jasmine.createSpy("animation mock")
-      after = jasmine.createSpy("after mock")
       eventname = "eventName"
       beforeEach ->
         a.pickerManager = jasmine.createSpy("pickerManager mock")
@@ -107,25 +114,34 @@ describe "Animator", ->
       describe "when already animating", ->
         beforeEach ->
           a.animating = true
-        for f in [before]
-          it "does not call '#{f}'", ->
-            a._animate(before, animation, after, eventname)
-            expect(before).not.toHaveBeenCalled()
+          it "does not call the animation", ->
+            a._animate(animation, eventname)
+            expect(animation).not.toHaveBeenCalled()
 
       describe "when not already animating", ->
         beforeEach ->
           a.animating = false
           a.$picker = jasmine.createSpy("picker mock")
-          a.$picker.trigger = jasmine.createSpy('trigger mock')
 
-        for f in [before, animation, after]
-          it "does not call '#{f}'", ->
-            a._animate(before, animation, after, eventname)
-            expect(before).toHaveBeenCalled()
+        it "sets @animating to true", ->
+          a._animate(animation, eventname)
+          expect(a.animating).toBe(true)
 
-        it "triggers the 'eventName' event", ->
-          a._animate(before, animation, after, eventname)
-          expect(a.$picker.trigger).toHaveBeenCalledWith(eventname)
+        it "sets @currentEventName to the given event name so we can trigger it later", ->
+          a._animate(animation, eventname)
+          expect(a.currentEventName).toBe(eventname)
+
+        describe "if animation is a function", ->
+          it "calls the animation", ->
+            spyOn(animation, 'apply')
+            a._animate(animation, eventname)
+            expect(animation.apply).toHaveBeenCalledWith(a, [a.pickerManager])
+
+        describe "if animation is not a function", ->
+          it "does not call the animation", ->
+            spyOn(animation, 'apply')
+            a._animate("not a function", eventname)
+            expect(animation.apply).not.toHaveBeenCalled()
 
 
     describe "#_setElements", ->
