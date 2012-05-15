@@ -18,31 +18,39 @@ class chronos.Animator
 
   # Animate shift to previous month
   previousMonth: ->
-    animationPrepare = @animations.previousMonthPrepare || @_animatePreviousMonthPrepare
     animation = @animations.previousMonth || @_animatePreviousMonth
-    animationCallback = @animations.previousMonthCallback || @_animatePreviousMonthCallback
-    @_animate(animationPrepare, animation, animationCallback, 'previousMonthFinished')
+    @_animate(animation, 'previousMonthFinished')
 
   # Animate shift to next month
   nextMonth: ->
-    animationPrepare = @animations.nextMonthPrepare || @_animateNextMonthPrepare
     animation = @animations.nextMonth || @_animateNextMonth
-    animationCallback = @animations.nextMonthCallback || @_animateNextMonthCallback
-    @_animate(animationPrepare, animation, animationCallback, 'nextMonthFinished')
+    @_animate(animation, 'nextMonthFinished')
+
+  # Animate closing the date picker
+  close: ->
+    animation = @animations.close || @_animateClose
+    @_animate(animation, 'close')
+
+  # callback used to set animation to finished
+  # Note: Custom animations must call this function at the end of their routine
+  #       by this.animationFinished()
+  animationFinished: ->
+    @animating = false
+    @$picker.trigger(@currentEventName) if @currentEventName
+    @currentEventName = null
 
   ###
     Private Methods
   ###
 
   # common animation pattern
-  _animate: (before, animation, after, eventName) ->
+  _animate: (animation, eventName) ->
     unless @animating
       @animating = true
-      before.apply(@, [@pickerManager])
-      $.when(animation.apply(@, [@pickerManager])).always =>
-        $.when(after.apply(@, [@pickerManager])).always =>
-          @animating = false
-          @$picker.trigger(eventName)
+      @currentEventName = eventName
+
+      if $.isFunction(animation)
+        animation.apply(@, [@pickerManager])
 
   # set the body, next, current, and previous elements for given picker
   _setElements: ->
@@ -57,17 +65,16 @@ class chronos.Animator
 
   # Default animation for previous month
   _animatePreviousMonth: (pickerManager) ->
+    pickerManager._renderTitle(@$prev.find(".monthBody").attr('data-date_title'))
     width = @$curr.outerWidth()
     @$curr.animate {
       left: "+=#{width}"
     }, 500
     @$prev.animate {
       left: "+=#{width}"
-    }, 500
-
-  # default action to before previous month animation
-  _animatePreviousMonthPrepare: (pickerManager) ->
-    pickerManager._renderTitle(@$prev.find(".monthBody").attr('data-date_title'))
+    }, 500, =>
+      @_animatePreviousMonthCallback(pickerManager)
+      @animationFinished()
 
   # default actions to perform after previous month animation
   _animatePreviousMonthCallback: (pickerManager) ->
@@ -88,20 +95,20 @@ class chronos.Animator
 
     newCurrentDate = new Date(parseInt(@$prev.find(".monthBody").attr('data-date')))
     pickerManager._buildMonth(pickerManager._changeMonthBy(newCurrentDate, -1), $new_prev)
+    @_setElements()
 
   # default action for next month animation
   _animateNextMonth: (pickerManager) ->
+    pickerManager._renderTitle(@$next.find(".monthBody").attr('data-date_title'))
     width = @$curr.outerWidth()
     @$curr.animate {
       left: "-=#{width}"
     }, 500
     @$next.animate {
       left: "-=#{width}"
-    }, 500
-
-  # default action to before next month animation
-  _animateNextMonthPrepare: (pickerManager) ->
-    pickerManager._renderTitle(@$next.find(".monthBody").attr('data-date_title'))
+    }, 500, =>
+      @_animateNextMonthCallback(pickerManager)
+      @animationFinished()
 
   # default actions to perform after next month animation
   _animateNextMonthCallback: (pickerManager) ->
@@ -122,6 +129,15 @@ class chronos.Animator
 
     newCurrentDate = new Date(parseInt(@$next.find(".monthBody").attr('data-date')))
     pickerManager._buildMonth(pickerManager._changeMonthBy(newCurrentDate, 1), $new_next)
+    @_setElements()
+
+  # default animation to close picker
+  _animateClose: (pickerManager) ->
+    @$picker.animate {
+      opacity: 0
+    }, 300, =>
+      @animationFinished()
+
 
 
 

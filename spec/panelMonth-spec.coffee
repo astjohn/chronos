@@ -34,7 +34,16 @@ describe "PanelMonth", ->
 
     describe "#render", ->
       it "returns a jquery element", ->
-        pending
+        expect(p.render().hide()).toBeTruthy()
+
+      it "returns a monthPanel", ->
+        expect(p.render().hasClass("monthPanel")).toBeTruthy()
+
+      it "returns a monthPanel with a header", ->
+        expect(p.render().children(".monthHeader").length).toEqual(1)
+
+      it "returns a monthPanel with a body", ->
+        expect(p.render().children(".monthBody").length).toEqual(1)
 
 
   describe "private methods", ->

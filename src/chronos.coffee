@@ -39,7 +39,7 @@ class chronos.Chronos
     animations: {}
     debug: false
 
-  @events: ['daySelect', 'previousMonthFinished', 'nextMonthFinished']
+  @events: ['close', 'daySelect', 'previousMonthFinished', 'nextMonthFinished']
 
 
   ###
@@ -145,8 +145,6 @@ class chronos.Chronos
   # iterate through the expiredPickers array and close each associated picker
   # if it exists
   _closePickers: ->
-
-    # TODO: use when/then to animate closing ???
     while @expiredPickers.length > 0
       settings = @expiredPickers.pop()
       $pickerElement = $(settings.activePicker)
@@ -163,10 +161,18 @@ class chronos.Chronos
   # Close datepick if clicked anywhere in document except current picker or
   # current displayElement
   _externalClickClose: (event) ->
-    $target = $(event.target)
-    $picker = if $target.hasClass('.chronos_picker') then $target else $target.parents('.chronos_picker')
-    unless ($picker.length > 0 && $picker[0] == @current.activePicker) || event.target == @current.displayElement
-      @_directClose()
+    if @current
+      $target = $(event.target)
+      $picker = if $target.hasClass('.chronos_picker')
+        $target
+      else
+        $target.parents('.chronos_picker')
+
+      unless ($picker.length > 0 && $picker[0] == @current.activePicker) ||
+      (@current.displayElement && (event.target == @current.displayElement))
+        # start animation and close sequence which will fire 'close'
+        # caught by '_onClose'
+        @activePicker.close() if $.isFunction(@activePicker.close)
 
 
   ###
@@ -181,7 +187,8 @@ class chronos.Chronos
     @_renderPicker()
 
 
-  # This method is called from within a picker to directly close itself
+  # This method is called from within a picker's #close method to tell chronos
+  # to proceed with removing the element
   _onClose: (event) ->
     event.stopPropagation()
     console.log "CHRONOS CLOSE!", @, event

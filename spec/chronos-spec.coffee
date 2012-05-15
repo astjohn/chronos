@@ -8,6 +8,12 @@ describe "Chronos", ->
 
   describe "public methods", ->
 
+    describe "initialize", ->
+      it "sets a mousedown event on the document so it knows when to close a picker", ->
+        spyOn(c, '_externalClickClose')
+        $(input).mousedown()
+        expect(c._externalClickClose).toHaveBeenCalled()
+
     describe "#setCurrentElement", ->
       oldSettings = {}
       oldElement = {}
@@ -21,10 +27,10 @@ describe "Chronos", ->
         newSettings = {new: "settings"}
         $.data(newElement[0], chronos.Chronos.PROP_NAME, newSettings)
 
-      it "pushes the current settings to the old list", ->
-        c.current = oldSettings
-        c.setCurrentElement(oldElement[0])
-        expect(c.oldList[0]).toBe(oldSettings)
+      it "calls _expirePicker", ->
+        spyOn(c, '_expirePicker')
+        c.setCurrentElement(newElement[0])
+        expect(c._expirePicker).toHaveBeenCalled()
 
       it "sets the current settings for the given element", ->
         c.setCurrentElement(newElement[0])
@@ -34,6 +40,8 @@ describe "Chronos", ->
   describe "private methods", ->
 
     describe "#_attach", ->
+      beforeEach ->
+        spyOn(c, '_saveCurrentSettings')
 
       it "sets @current.settings to the default settings if given no settings", ->
         c._attach(input, {})
@@ -52,10 +60,18 @@ describe "Chronos", ->
         c._attach(input, {})
         expect(c.current.valueElement).toBe(input)
 
-      it "saves the displayElement to @current", ->
-        spyOn(c, '_buildDisplayElement').andReturn(["mockDisplayElement"])
+      it "calls _saveCurrentSettings", ->
         c._attach(input, {})
-        expect(c.current.displayElement).toEqual("mockDisplayElement")
+        expect(c._saveCurrentSettings).toHaveBeenCalled()
+
+
+    describe "_saveCurrentSettings", ->
+      it "saves the settings using jquery's $.data", ->
+        de = $("<div class='mock display element' />")
+        c.current.displayElement = de[0]
+        c.current.options = {some: 'settings'}
+        c._saveCurrentSettings()
+        expect($.data(de[0], chronos.Chronos.PROP_NAME)).toEqual(c.current)
 
 
     describe "#_buildDisplayElement", ->
@@ -96,16 +112,13 @@ describe "Chronos", ->
           $de = c._buildDisplayElement()
           expect($de.val()).toBeFalsy()
 
-      it "persists the given element's settings using $.data and the display element", ->
+      it "sets the current display elements so that it can be saved later", ->
         $de = c._buildDisplayElement()
-        expect($.data($de[0], chronos.Chronos.PROP_NAME)).toBeTruthy()
+        expect(c.current.displayElement).toBe($de[0])
 
 
     describe "#_renderPicker", ->
-      it "creates a new Picker", ->
-        spyOn(chronos, 'Picker')
-        c._renderPicker()
-        expect(chronos.Picker).toHaveBeenCalledWith(c.current)
+      pending
 
 
   describe "events", ->

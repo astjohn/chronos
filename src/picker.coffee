@@ -21,12 +21,12 @@ class chronos.Picker
     Public Methods
   ###
 
-  # Chronos listens for close events to manage all pickers.
+  # This method animated the close event and then triggers the removal of the picker
+  # from the DOM.
+  # Chronos listens for close events to manage removal of all pickers.
   # Chronos will call close on picker when necessary
   close: ->
-    # animate close
-    # unbind everything
-    # remove element
+    @animator.close() # animator will trigger 'close' which will fire in Chronos
 
   ###
     Private Methods
@@ -34,9 +34,9 @@ class chronos.Picker
 
   _initialize: ->
     # container div for the datepicker
-    @$container ||= @_initializeContainer()
+    @_initializeContainer()
     # to animate the datepicker
-    @animator ||= new chronos.Animator(@, @current.options.animations)
+    @_initializeAnimator()
     @_setStartingDate()
 
   _initializeContainer: ->
@@ -44,6 +44,12 @@ class chronos.Picker
     @_bindContainerEvents()
     @$container.append(@_createHeader.call(@))
     @$container.append(@_createBody.call(@))
+    @$container
+
+  _initializeAnimator: ->
+    @animator = new chronos.Animator(@, @current.options.animations)
+    @animator.setPicker(@$container)
+    @animator
 
 
   # returns container div for picker
@@ -182,19 +188,21 @@ class chronos.Picker
     EVENT HANDLERS
   ###
 
+  # Handle header title clicks
   _onZoomOut: (event) ->
     console.log ("ZOOM!")
 
+  # Handle previous button clicks
   _onPrevious: (event) ->
     console.log "previous!", event
-    @animator.setPicker(@$container)
     @animator.previousMonth()
 
+  # Handle next button clicks
   _onNext: (event) ->
     console.log "next!", event
-    @animator.setPicker(@$container)
     @animator.nextMonth()
 
+  # Handle day selection
   _onDaySelect: (event, dayElement, date) ->
     console.log "SELECTED DAY", event, dayElement, date
 
@@ -203,15 +211,11 @@ class chronos.Picker
       @current.pickedDateTime = date
       @_saveSettings()
       @_updateInputValues()
-      # Trigger Chronos closing sequence
-
-      # TODO: CLOSE ANIMATION
-      @$container.trigger('close')
+      @close()
     else
       # TODO
 
-
-  # Bind all events to valueElement for easy access
+  # Bind all container (picker) events to valueElement for easy access
   _bindContainerEvents: ->
     for eventType in chronos.Chronos.events
       @$container.on(eventType, (event) =>
