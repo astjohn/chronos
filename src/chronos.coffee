@@ -126,22 +126,18 @@ class chronos.Chronos
 
   # Construct a date picker and render it
   _renderPicker: ->
-    activePicker = unless @current.activePicker
-      @_createPicker()
-    else
-      @current.activePicker
+    @_createPicker() unless @current.activePicker
 
 
     # TODO: TEMPORARY
-    activePicker._renderMonths()
-    activePicker.insertAfter($(@current.displayElement))
-
-    @current.activePicker = activePicker
-    activePicker
+    @current.activePicker._renderMonths()
+    @current.activePicker.insertAfter($(@current.displayElement))
+    @current.activePicker
 
   # Create a new picker.
   _createPicker: ->
     picker = new chronos.Picker(@current)
+    @current.activePicker = picker
     # To handle events originating in picker which would result in the removal
     # of the picker itself.
     picker.$container.on
