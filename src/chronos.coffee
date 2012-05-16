@@ -49,6 +49,7 @@ class chronos.Chronos
   ###
 
   initialize: ->
+    # TODO: close on TAB key
     # close datepicker if clicked anywhere in document except current picker
     $(document).mousedown (event) =>
       @_externalClickClose(event)
@@ -195,7 +196,11 @@ class chronos.Chronos
       # Do not close if we're clicking on the currently active picker
       @_directClose() if @_notActivePicker($picker) || @_noPickerButActive($picker)
 
-
+  # returns true if given element is associated with the activePicker
+  _isCurrentPicker: (target) ->
+    @current.activePicker != undefined &&
+    @current.activePicker != null &&
+    @current.activePicker.$displayElement[0] == target
 
   ###
     EVENT HANDLERS
@@ -203,10 +208,11 @@ class chronos.Chronos
 
   # Used for focus on displayElement
   # Before starting anything, set the current element to obtain the correct picker
-  # and its associated settings.  Then render the picker.
+  # and its associated settings.  Then render the picker unless it's the current picker.
   _onFocus: (event) ->
-    @setCurrentElement(event.target)
-    @_renderPicker()
+    unless @_isCurrentPicker(event.target)
+      @setCurrentElement(event.target)
+      @_renderPicker()
 
 
   # This method is called when a picker triggers 'internal_close' to tell chronos

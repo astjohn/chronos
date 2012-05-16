@@ -332,20 +332,65 @@ describe "Chronos", ->
           expect(mock_picker.close).toHaveBeenCalled()
 
 
+    describe "#_isCurrentPicker", ->
+      beforeEach ->
+        c.current = {}
+
+      it "returns false if the active picker is undefined", ->
+        c.current.activePicker = undefined
+        expect(c._isCurrentPicker()).toEqual(false)
+
+      it "returns false if the active picker is null", ->
+        c.current.activePicker = null
+        expect(c._isCurrentPicker()).toEqual(false)
+
+      describe "when there is an active picker", ->
+
+        it "returns true if the picker's display element is equal to the target", ->
+          target = "some element"
+          c.current.activePicker =
+            $displayElement: [target]
+          expect(c._isCurrentPicker(target)).toEqual(true)
+
+        it "returns false if the picker's display element is not equal to the target", ->
+          target = "some element"
+          c.current.activePicker =
+            $displayElement: ["some other display element"]
+          expect(c._isCurrentPicker(target)).toEqual(false)
+
+
   describe "events", ->
 
     describe "#_onFocus", ->
       beforeEach ->
+        c.current =
+          activePicker: undefined
         spyOn(c, 'setCurrentElement')
         spyOn(c, '_renderPicker')
 
-      it "calls #setCurrentElement", ->
-        c._onFocus({target: "some target"})
-        expect(c.setCurrentElement).toHaveBeenCalledWith("some target")
+      describe "when not the activePicker", ->
+        beforeEach ->
+          spyOn(c, "_isCurrentPicker").andReturn(false)
 
-      it "calls #_renderPicker", ->
-        c._onFocus({target: "some target"})
-        expect(c._renderPicker).toHaveBeenCalled()
+        it "calls #setCurrentElement", ->
+          c._onFocus({target: "some target"})
+          expect(c.setCurrentElement).toHaveBeenCalledWith("some target")
+
+        it "calls #_renderPicker", ->
+          c._onFocus({target: "some target"})
+          expect(c._renderPicker).toHaveBeenCalled()
+
+      describe "when it is the active picker", ->
+        beforeEach ->
+          spyOn(c, "_isCurrentPicker").andReturn(true)
+
+        it "does not call #setCurrentElement", ->
+          c._onFocus({target: "some target"})
+          expect(c.setCurrentElement).not.toHaveBeenCalled()
+
+        it "does not call #_renderPicker", ->
+          c._onFocus({target: "some target"})
+          expect(c._renderPicker).not.toHaveBeenCalled()
 
     describe "#_onClose", ->
       mock_event = {stopPropagation: "whatever"}
