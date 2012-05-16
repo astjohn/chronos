@@ -28,6 +28,7 @@ $colorOtherMonth: #E1DBFF;
   color: $colorText;
   @include border-radius($border_radius);
   overflow: hidden; // needed to body_prev and body_next
+  display: none; // show with open animation
 
   .body {
     width: 3*$calendar_width;

@@ -90,7 +90,7 @@ describe "Animator", ->
       it "calls animate with the correct arguments", ->
         spyOn(a, '_animate')
         a.close()
-        expect(a._animate).toHaveBeenCalledWith(animation, 'closed')
+        expect(a._animate).toHaveBeenCalledWith(animation, 'closed', true)
 
     describe "without custom animations", ->
       beforeEach ->
@@ -100,7 +100,7 @@ describe "Animator", ->
         spyOn(a, '_animate')
         spyOn(a, '_animateClose')
         a.close()
-        expect(a._animate).toHaveBeenCalledWith(a._animateClose, 'closed')
+        expect(a._animate).toHaveBeenCalledWith(a._animateClose, 'closed', true)
 
   describe "#open", ->
     describe "when given custom animations", ->
@@ -133,12 +133,19 @@ describe "Animator", ->
       beforeEach ->
         a.pickerManager = jasmine.createSpy("pickerManager mock")
 
-      describe "when already animating", ->
+      describe "when already animating and no override", ->
         beforeEach ->
           a.animating = true
           it "does not call the animation", ->
             a._animate(animation, eventname)
             expect(animation).not.toHaveBeenCalled()
+
+      describe "when already animating with override", ->
+        beforeEach ->
+          a.animating = true
+          it "does call the animation", ->
+            a._animate(animation, eventname, true)
+            expect(animation).toHaveBeenCalled()
 
       describe "when not already animating", ->
         beforeEach ->

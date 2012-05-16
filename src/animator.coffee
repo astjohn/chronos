@@ -29,7 +29,7 @@ class chronos.Animator
   # Animate closing the date picker
   close: ->
     animation = @animations.close || @_animateClose
-    @_animate(animation, 'closed')
+    @_animate(animation, 'closed', true)
 
   # Animate opening the date picker
   open: ->
@@ -49,7 +49,8 @@ class chronos.Animator
   ###
 
   # common animation pattern
-  _animate: (animation, eventName) ->
+  _animate: (animation, eventName, override) ->
+    @animating = false if override
     unless @animating
       @animating = true
       @currentEventName = eventName
@@ -146,10 +147,10 @@ class chronos.Animator
 
   # default animation to close picker
   _animateOpen: (pickerManager) ->
-    @$picker.animate {
-      opacity: 100
-    }, 300, =>
+    @$picker.fadeIn('fast', =>
       @animationFinished()
+    )
+
 
 
 

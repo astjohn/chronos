@@ -28,6 +28,12 @@
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=$startColor, endColorstr=$endColor, GradientType=0); // IE9 and down
 }
 
+// Opacity
+@mixin opacity($opacity: 100) {
+  opacity: $opacity / 100;
+   filter: "alpha(opacity=#{$opacity})";
+}
+
 //// Transitions
 //@mixin transition($transition) {
 //  -webkit-transition: $transition;
@@ -37,11 +43,7 @@
 //          transition: $transition;
 //}
 
-//// Opacity
-//@mixin opacity($opacity: 100) {
-//  opacity: $opacity / 100;
-//   filter: "alpha(opacity=#{$opacity})";
-//}
+
 
 //// Background sizing
 //@mixin background-size($size) {
