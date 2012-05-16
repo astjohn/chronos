@@ -282,7 +282,7 @@ describe "PanelMonth", ->
           p.container.trigger = jasmine.createSpy("container")
           mock_event = {target: "mock target element"}
           p._onDaySelect(mock_event, "date")
-          expect(p.container.trigger).toHaveBeenCalledWith('daySelect',
+          expect(p.container.trigger).toHaveBeenCalledWith('daySelected',
             ['date', 'mock target element'])
 
 

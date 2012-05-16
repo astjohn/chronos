@@ -26,15 +26,18 @@ describe "Chronos", ->
         newElement = $(input)
         newSettings = {new: "settings"}
         $.data(newElement[0], chronos.Chronos.PROP_NAME, newSettings)
+        spyOn(c, '_expirePicker')
 
       it "calls _expirePicker", ->
-        spyOn(c, '_expirePicker')
         c.setCurrentElement(newElement[0])
         expect(c._expirePicker).toHaveBeenCalled()
 
       it "sets the current settings for the given element", ->
         c.setCurrentElement(newElement[0])
         expect(c.current).toBe(newSettings)
+
+    describe "#setDateRange", ->
+      pending
 
 
   describe "private methods", ->
@@ -68,6 +71,7 @@ describe "Chronos", ->
     describe "_saveCurrentSettings", ->
       it "saves the settings using jquery's $.data", ->
         de = $("<div class='mock display element' />")
+        c.current = {}
         c.current.displayElement = de[0]
         c.current.options = {some: 'settings'}
         c._saveCurrentSettings()
@@ -116,22 +120,243 @@ describe "Chronos", ->
         $de = c._buildDisplayElement()
         expect(c.current.displayElement).toBe($de[0])
 
+    describe "#_createPicker", ->
 
     describe "#_renderPicker", ->
       pending
 
 
+    #   _findPickerFromEvent: (event) ->
+    # $target = $(event.target)
+    # $picker = if $target.hasClass('chronos_picker')
+    #   $target
+    # else
+    #   $target.parents('.chronos_picker')
+    describe "#_findPickerFromEvent", ->
+      picker = "<div class='chronos_picker' />"
+      monthBody = "<div class='monthBody'></div>"
+      day = "<div class='day'></div>"
+      event = {}
+
+      it "returns en empty jquery object if a picker was not found", ->
+        event.target = "<div class='something else'></div>"
+        test = c._findPickerFromEvent(event)
+        expect(test.length).toEqual(0)
+
+      it "can find a picker if target was a child", ->
+        $picker = $(picker)
+        $monthBody = $(monthBody)
+        $day = $(day)
+        $picker.append($monthBody.append($day))
+        event.target = $day[0]
+        test = c._findPickerFromEvent(event)
+        expect(test.length).toEqual(1)
+
+      it "can find a picker if target was a picker", ->
+        event.target = picker
+        test = c._findPickerFromEvent(event)
+        expect(test.length).toEqual(1)
+
+
+    describe "#_notActivePicker", ->
+      $picker = {}
+
+      describe "when given an invalid picker", ->
+        it "returns true", ->
+          $picker = jasmine.createSpy("picker")
+          spyOn($picker, 'length').andReturn(0)
+          expect(c._notActivePicker($picker)).toEqual(false)
+
+      describe "when given a valid picker", ->
+        beforeEach ->
+          c.current =
+            activePicker: {}
+
+        it "returns true if the $picker element is not the activePicker element", ->
+          $picker = $("<div>picker</div>")
+          c.current.activePicker.$container = $("<div>not match</div>")
+          expect(c._notActivePicker($picker)).toEqual(true)
+
+        it "returns false if the $picker element is equal to the activePicker element", ->
+          $picker = $("<div>picker</div>")
+          c.current.activePicker.$container = $picker
+          expect(c._notActivePicker($picker)).toEqual(false)
+
+
+    describe "#_noPickerButActive", ->
+
+      describe "when given a valid picker", ->
+        it "returns false", ->
+          $picker = $("<div>picker</div>")
+          c.current = {}
+          c.current.activePicker = "something"
+          expect(c._noPickerButActive($picker)).toEqual(false)
+
+      describe "when given an invalid picker", ->
+        it "returns true if there is an active picker", ->
+          $picker = jasmine.createSpy("mock picker")
+          spyOn($picker, 'length').andReturn(0)
+          c.current = {}
+          c.current.activePicker = "something"
+          expect(c._noPickerButActive($picker)).toEqual(true)
+
+        it "returns false if the active picker is null", ->
+          $picker = jasmine.createSpy("mock picker")
+          spyOn($picker, 'length').andReturn(0)
+          c.current = {}
+          c.current.activePicker = null
+          expect(c._noPickerButActive($picker)).toEqual(false)
+
+        it "returns false if the active picker is undefined", ->
+          $picker = jasmine.createSpy("mock picker")
+          spyOn($picker, 'length').andReturn(0)
+          c.current = {}
+          c.current.activePicker = undefined
+          expect(c._noPickerButActive($picker)).toEqual(false)
+
+
+    describe "#_externalClickClose", ->
+
+      it "does not call #_directClose if there are not current settings", ->
+        c.current = null
+        spyOn(c, '_directClose')
+        c._externalClickClose()
+        expect(c._directClose).not.toHaveBeenCalled()
+
+      describe "when there are current settings", ->
+        beforeEach ->
+          c.current = {}
+          spyOn(c, '_findPickerFromEvent')
+          spyOn(c, '_directClose')
+
+        describe "when given a picker", ->
+          beforeEach ->
+            spyOn(c, '_noPickerButActive')
+
+          it "calls #_directClose if it is not the active one", ->
+            spyOn(c, '_notActivePicker').andReturn(true)
+            c._externalClickClose()
+            expect(c._directClose).toHaveBeenCalled()
+
+          it "does not call #_directClose if it is the active one", ->
+            spyOn(c, '_notActivePicker').andReturn(false)
+            c._externalClickClose()
+            expect(c._directClose).not.toHaveBeenCalled()
+
+        describe "when no picker is found", ->
+          beforeEach ->
+            spyOn(c, '_notActivePicker')
+
+          it "calls #_directClose if it is the active one", ->
+            spyOn(c, '_noPickerButActive').andReturn(true)
+            c._externalClickClose()
+            expect(c._directClose).toHaveBeenCalled()
+
+          it "does not call #_directClose if there is no active picker", ->
+            spyOn(c, '_noPickerButActive').andReturn(false)
+            c._externalClickClose()
+            expect(c._directClose).not.toHaveBeenCalled()
+
+  # # Close datepicker if clicked anywhere in document except current picker or
+  # # current displayElement
+  # _externalClickClose: (event) ->
+  #   if @current
+  #     $picker = @_findPickerFromEvent(event)
+
+  #     # Close picker if we're clicking on a different picker somehow
+  #     # or if we're clicking elsewhere and there's an active picker
+  #     # Do not close if we're clicking on the currently active picker
+  #     @_directClose() if @_notActivePicker($picker) || @_noPickerButActive($picker)
+
+
+
+
+    describe "#_expirePicker", ->
+      activePicker = "mockActivePicker"
+      beforeEach ->
+        c.current = {}
+
+      describe "when there is an active picker", ->
+
+        it "adds the active picker to the array of expiredPickers", ->
+          c.current.activePicker = activePicker
+          c._expirePicker()
+          expect(c.expiredPickers[0]).toEqual(activePicker)
+
+      describe "when there is not an active picker", ->
+
+        it "does not add the active picker to the expiredPickers array", ->
+          c.current.activePicker = null
+          c._expirePicker()
+          expect(c.expiredPickers.length).toEqual(0)
+
+      it "sets the activePicker to null", ->
+        c.current.activePicker = activePicker
+        c._expirePicker()
+        expect(c.activePicker).toBeNull()
+
+
+    describe "#_directClose", ->
+      beforeEach ->
+        spyOn(c, '_expirePicker')
+        spyOn(c, '_closePickers')
+        c._directClose()
+
+      it "calls #_expirePicker", ->
+        expect(c._expirePicker).toHaveBeenCalled()
+
+      it "calls #_closePickers", ->
+        expect(c._closePickers).toHaveBeenCalled()
+
+
+    describe "#_closePickers", ->
+
+      describe "when there are no expiredPickers", ->
+        it "does not attempt to close any", ->
+          c.expiredPickers = []
+          spyOn(c.expiredPickers, 'pop')
+          c._closePickers()
+          expect(c.expiredPickers.pop).not.toHaveBeenCalled()
+
+      describe "when there are expiredPickers", ->
+        mock_picker = {close: "whatever"}
+        beforeEach ->
+          c.expiredPickers = [mock_picker]
+          spyOn(mock_picker, 'close')
+          c._closePickers()
+
+        it "pops pickers from the list", ->
+          expect(c.expiredPickers.length).toEqual(0)
+
+        it "closes the picker", ->
+          expect(mock_picker.close).toHaveBeenCalled()
+
+
   describe "events", ->
 
     describe "#_onFocus", ->
+      beforeEach ->
+        spyOn(c, 'setCurrentElement')
+        spyOn(c, '_renderPicker')
 
       it "calls #setCurrentElement", ->
-        spyOn(c, '_renderPicker').andReturn("mock")
-        c.setCurrentElement = jasmine.createSpy("setCurrentElement")
         c._onFocus({target: "some target"})
         expect(c.setCurrentElement).toHaveBeenCalledWith("some target")
 
       it "calls #_renderPicker", ->
-        c._renderPicker = jasmine.createSpy("_renderPicker")
         c._onFocus({target: "some target"})
         expect(c._renderPicker).toHaveBeenCalled()
+
+    describe "#_onClose", ->
+      mock_event = {stopPropagation: "whatever"}
+      beforeEach ->
+        spyOn(mock_event, 'stopPropagation')
+        spyOn(c, '_directClose')
+
+      it "stops event propagation", ->
+        c._onClose(mock_event)
+        expect(mock_event.stopPropagation).toHaveBeenCalled()
+
+      it "calls #_directClose", ->
+        c._onClose(mock_event)
+        expect(c._directClose).toHaveBeenCalled()

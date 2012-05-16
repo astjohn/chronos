@@ -133,5 +133,5 @@ class chronos.PanelMonth
   # Fire daySelect
   _onDaySelect: (event, date) ->
     $target = $(event.target)
-    @container.trigger('daySelect', [date, event.target]) unless $target.hasClass("unavailable")
+    @container.trigger('daySelected', [date, event.target]) unless $target.hasClass("unavailable")
 

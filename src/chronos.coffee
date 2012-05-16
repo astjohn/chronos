@@ -2,8 +2,8 @@
 class chronos.Chronos
 
   constructor: () ->
-    @current = {}
-    @activePicker = {}
+    @current = null
+    @activePicker = null
     @expiredPickers = [] # array of picker elements
     @initialize()
 
@@ -35,11 +35,13 @@ class chronos.Chronos
     minDate: null
     startDay: 0  # Sunday (0) through Saturday (6) - be aware that this may affect your
                  # layout, since the days on the right might have a different margin
+    pickedDateTime: null # start datepicker at a specific date
     useTimePicker: false # set to true to be able to set time with date
     animations: {}
     debug: false
 
-  @events: ['close', 'daySelect', 'previousMonthFinished', 'nextMonthFinished']
+  @events: ['opened', 'closed', 'daySelected', 'previousMonthFinished',
+            'nextMonthFinished']
 
 
   ###
@@ -99,9 +101,12 @@ class chronos.Chronos
     else
       if s.startBlank then "" else df.format(new Date(), s.displayFormat)
 
+    displayClass = "chronos_picker_display"
+    displayClass += " #{@current.options.pickerClass}_display" if @current.options.pickerClass
     $displayElement = $ve.clone(true) # make copy of input element
       .removeAttr('name') # remove name attribute so value is not posted to server
       .attr('id', $ve.attr('id') + '_display') # avoid id conflict
+      .addClass(displayClass)
       .val(initValue) # set initial display value to initial valueElement value
 
     # show valueElement during debug mode
@@ -120,59 +125,76 @@ class chronos.Chronos
 
   # Construct a date picker and render it
   _renderPicker: ->
-    @activePicker = new chronos.Picker(@current)
-    #p.build()
-
-    @activePicker.$container.on
-      'close': (event) =>
-        @_onClose(event)
+    activePicker = unless @current.activePicker
+      @_createPicker()
+    else
+      @current.activePicker
 
 
     # TODO: TEMPORARY
-    @activePicker._renderMonths()
+    activePicker._renderMonths()
+    activePicker.insertAfter($(@current.displayElement))
 
-    $(@current.displayElement).after(@activePicker.$container)
+    @current.activePicker = activePicker
+    activePicker
 
-    @current.activePicker = @activePicker.$container[0]
+  # Create a new picker.
+  _createPicker: ->
+    picker = new chronos.Picker(@current)
+    # To handle events originating in picker which would result in the removal
+    # of the picker itself.
+    picker.$container.on
+      'internal_close': (event) =>
+        @_onClose(event)
+    picker
 
-    @activePicker
+
 
 
   # place the settings into the expiredPickers array
   _expirePicker: ->
-    @expiredPickers.push @current if @current
+    @expiredPickers.push @current.activePicker if @current.activePicker
+    @current.activePicker = null
 
   # iterate through the expiredPickers array and close each associated picker
   # if it exists
   _closePickers: ->
     while @expiredPickers.length > 0
-      settings = @expiredPickers.pop()
-      $pickerElement = $(settings.activePicker)
-      if $pickerElement.length > 0
-        $pickerElement.remove()
-
+      picker = @expiredPickers.pop()
+      picker.close()
 
   # close current picker directly, i.e. not through a different onFocus event
   _directClose: ->
     @_expirePicker()
     @_closePickers()
 
+  # Attempt to find a picker given a Jquery Event object
+  _findPickerFromEvent: (event) ->
+    $target = $(event.target)
+    $picker = if $target.hasClass('chronos_picker')
+      $target
+    else
+      $target.parents('.chronos_picker')
 
-  # Close datepick if clicked anywhere in document except current picker or
+  # Returns true if given picker is valid and not the active Picker
+  _notActivePicker: ($picker) ->
+    $picker.length > 0 && $picker[0] != @current.activePicker.$container[0]
+
+  # Return true if given picker is invalid and we have an active picker
+  _noPickerButActive: ($picker) ->
+    $picker.length <= 0 && (@current.activePicker != null && @current.activePicker != undefined)
+
+  # Close datepicker if clicked anywhere in document except current picker or
   # current displayElement
   _externalClickClose: (event) ->
     if @current
-      $target = $(event.target)
-      $picker = if $target.hasClass('.chronos_picker')
-        $target
-      else
-        $target.parents('.chronos_picker')
+      $picker = @_findPickerFromEvent(event)
 
-      unless ($picker.length > 0 && $picker[0] == @current.activePicker) ||
-      (@current.displayElement && (event.target == @current.displayElement))
-        # start animation and close sequence which will fire 'close'
-        # caught by '_onClose'
-        @activePicker.close() if $.isFunction(@activePicker.close)
+      # Close picker if we're clicking on a different picker somehow
+      # or if we're clicking elsewhere and there's an active picker
+      # Do not close if we're clicking on the currently active picker
+      @_directClose() if @_notActivePicker($picker) || @_noPickerButActive($picker)
+
 
 
   ###
@@ -187,11 +209,10 @@ class chronos.Chronos
     @_renderPicker()
 
 
-  # This method is called from within a picker's #close method to tell chronos
+  # This method is called when a picker triggers 'internal_close' to tell chronos
   # to proceed with removing the element
   _onClose: (event) ->
-    event.stopPropagation()
-    console.log "CHRONOS CLOSE!", @, event
+    event.stopPropagation() # do not propagate 'internal_close' event
     @_directClose()
 
 

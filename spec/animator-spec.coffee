@@ -90,7 +90,7 @@ describe "Animator", ->
       it "calls animate with the correct arguments", ->
         spyOn(a, '_animate')
         a.close()
-        expect(a._animate).toHaveBeenCalledWith(animation, 'close')
+        expect(a._animate).toHaveBeenCalledWith(animation, 'closed')
 
     describe "without custom animations", ->
       beforeEach ->
@@ -100,8 +100,30 @@ describe "Animator", ->
         spyOn(a, '_animate')
         spyOn(a, '_animateClose')
         a.close()
-        expect(a._animate).toHaveBeenCalledWith(a._animateClose, 'close')
+        expect(a._animate).toHaveBeenCalledWith(a._animateClose, 'closed')
 
+  describe "#open", ->
+    describe "when given custom animations", ->
+      animation = jasmine.createSpy('custom animation mock')
+      beforeEach ->
+        options =
+          open: animation
+        a = new chronos.Animator(pm, options)
+
+      it "calls animate with the correct arguments", ->
+        spyOn(a, '_animate')
+        a.open()
+        expect(a._animate).toHaveBeenCalledWith(animation, 'opened')
+
+    describe "without custom animations", ->
+      beforeEach ->
+        a = new chronos.Animator(pm, {})
+
+      it "calls animate with the defaults", ->
+        spyOn(a, '_animate')
+        spyOn(a, '_animateOpen')
+        a.open()
+        expect(a._animate).toHaveBeenCalledWith(a._animateOpen, 'opened')
 
   describe "private methods", ->
 

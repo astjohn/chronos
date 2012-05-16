@@ -29,7 +29,12 @@ class chronos.Animator
   # Animate closing the date picker
   close: ->
     animation = @animations.close || @_animateClose
-    @_animate(animation, 'close')
+    @_animate(animation, 'closed')
+
+  # Animate opening the date picker
+  open: ->
+    animation = @animations.open || @_animateOpen
+    @_animate(animation, 'opened')
 
   # callback used to set animation to finished
   # Note: Custom animations must call this function at the end of their routine
@@ -136,9 +141,15 @@ class chronos.Animator
     @$picker.animate {
       opacity: 0
     }, 300, =>
+      @$picker.remove()
       @animationFinished()
 
-
+  # default animation to close picker
+  _animateOpen: (pickerManager) ->
+    @$picker.animate {
+      opacity: 100
+    }, 300, =>
+      @animationFinished()
 
 
 

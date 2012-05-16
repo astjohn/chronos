@@ -224,24 +224,44 @@ describe "Picker", ->
       d = {}
       $container = {}
 
-      beforeEach ->
-        d = new Date("2012-05-10 00:00:00")
-        p.startingDate = d
+      describe "when no pickedDateTime", ->
+        beforeEach ->
+          p.startingDate = new Date("2012-05-10 00:00:00")
 
-      it "should build the current month", ->
-        p._renderMonths()
-        c = p.$container.find(".body_curr").find(".monthBody").attr("data-date_title")
-        expect(c).toEqual("May 2012")
+        it "should build the current month", ->
+          p._renderMonths()
+          c = p.$container.find(".body_curr").find(".monthBody").attr("data-date_title")
+          expect(c).toEqual("May 2012")
 
-      it "should build the previous month", ->
-        p._renderMonths()
-        c = p.$container.find(".body_prev").find(".monthBody").attr("data-date_title")
-        expect(c).toEqual("April 2012")
+        it "should build the previous month", ->
+          p._renderMonths()
+          c = p.$container.find(".body_prev").find(".monthBody").attr("data-date_title")
+          expect(c).toEqual("April 2012")
 
-      it "should build the next month", ->
-        p._renderMonths()
-        c = p.$container.find(".body_next").find(".monthBody").attr("data-date_title")
-        expect(c).toEqual("June 2012")
+        it "should build the next month", ->
+          p._renderMonths()
+          c = p.$container.find(".body_next").find(".monthBody").attr("data-date_title")
+          expect(c).toEqual("June 2012")
+
+      describe "when pickedDateTime", ->
+        beforeEach ->
+          p.startingDate = new Date("2012-05-10 00:00:00")
+          p.pickedDateTime = new Date("2013-06-15 00:00:00")
+
+        it "should build the current month for the pickedDateTime", ->
+          p._renderMonths()
+          c = p.$container.find(".body_curr").find(".monthBody").attr("data-date_title")
+          expect(c).toEqual("June 2013")
+
+        it "should build the previous month for the pickedDateTime", ->
+          p._renderMonths()
+          c = p.$container.find(".body_prev").find(".monthBody").attr("data-date_title")
+          expect(c).toEqual("May 2013")
+
+        it "should build the next month for the pickedDateTime", ->
+          p._renderMonths()
+          c = p.$container.find(".body_next").find(".monthBody").attr("data-date_title")
+          expect(c).toEqual("July 2013")
 
 
     describe "#_buildMonth", ->
@@ -382,7 +402,7 @@ describe "Picker", ->
           expect(p.animator.nextMonth).toHaveBeenCalled()
 
 
-      describe "#_onDaySelect", ->
+      describe "#_onDaySelected", ->
         date = new Date("2012-10-05")
         dayElement = $('<div class="day day3">9</div>')
         event = jasmine.createSpy("jquery event mock")
@@ -394,24 +414,25 @@ describe "Picker", ->
         describe "when not using time picker", ->
 
           it "sets @pickedDateTime to the given date", ->
-            p._onDaySelect(event, dayElement, date)
+            p._onDaySelected(event, dayElement, date)
             expect(p.pickedDateTime).toBe(date)
 
           it "sets @current.pickedDateTime", ->
-            p._onDaySelect(event, dayElement, date)
+            p._onDaySelected(event, dayElement, date)
             expect(p.current.pickedDateTime).toBe(date)
 
           it "saves settings", ->
-            p._onDaySelect(event, dayElement, date)
+            p._onDaySelected(event, dayElement, date)
             expect(p._saveSettings).toHaveBeenCalled()
 
           it "updates the inputs", ->
-            p._onDaySelect(event, dayElement, date)
+            p._onDaySelected(event, dayElement, date)
             expect(p._updateInputValues).toHaveBeenCalled()
 
-          it "calls #close", ->
-            p._onDaySelect(event, dayElement, date)
-            expect(p.close).toHaveBeenCalled()
+          it "tiggers 'internal_close' to let Chronos manage the closing process", ->
+            spyOn(p.$container, 'trigger')
+            p._onDaySelected(event, dayElement, date)
+            expect(p.$container.trigger).toHaveBeenCalledWith('internal_close')
 
         describe "when using time picker", ->
           pending

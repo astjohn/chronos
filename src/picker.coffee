@@ -26,7 +26,16 @@ class chronos.Picker
   # Chronos listens for close events to manage removal of all pickers.
   # Chronos will call close on picker when necessary
   close: ->
-    @animator.close() # animator will trigger 'close' which will fire in Chronos
+    unless @closing
+      @closing = true
+      @animator.close()
+
+  # Insert picker into DOM after container element and animate
+  insertAfter: ($element) ->
+    $element.after(@$container)
+    # TODO: Position on screen
+    # animate
+    @animator.open()
 
   ###
     Private Methods
@@ -106,21 +115,14 @@ class chronos.Picker
 
 
 
-
-
-
-
-
-
-
-
   # fill the picker's body with a range of months to select from
   _renderMonths: ->
-    @_buildMonth(@startingDate, @$container.find(".body_curr"))
+    start = @pickedDateTime || @startingDate # use pickedDateTime over dtartingDate
+    @_buildMonth(start, @$container.find(".body_curr"))
     # set title to current month
     @_renderTitle(@$container.find(".body_curr").find(".monthBody").attr('data-date_title'))
-    @_buildMonth(@_changeMonthBy(@startingDate, -1), @$container.find(".body_prev"))
-    @_buildMonth(@_changeMonthBy(@startingDate, 1), @$container.find(".body_next"))
+    @_buildMonth(@_changeMonthBy(start, -1), @$container.find(".body_prev"))
+    @_buildMonth(@_changeMonthBy(start, 1), @$container.find(".body_next"))
 
   # create a month panel according to given date and append it to given container
   _buildMonth: (showDate, $container) ->
@@ -135,8 +137,8 @@ class chronos.Picker
     )
     month = monthPanel.render()
     # handle day selection
-    month.bind 'daySelect', (event, date, dayElement) =>
-      @_onDaySelect(event, dayElement, date)
+    month.bind 'daySelected', (event, date, dayElement) =>
+      @_onDaySelected(event, dayElement, date)
     $container.append(month)
 
   # Increment or decrement given date by given value in months
@@ -203,15 +205,14 @@ class chronos.Picker
     @animator.nextMonth()
 
   # Handle day selection
-  _onDaySelect: (event, dayElement, date) ->
-    console.log "SELECTED DAY", event, dayElement, date
-
+  _onDaySelected: (event, dayElement, date) ->
     unless @current.options.useTimePicker
       @pickedDateTime = date
       @current.pickedDateTime = date
       @_saveSettings()
       @_updateInputValues()
-      @close()
+      # let Chronos manage closing picker, this event is not passed to the valueElement
+      @$container.trigger('internal_close')
     else
       # TODO
 
