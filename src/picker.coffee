@@ -1,7 +1,7 @@
 class chronos.Picker
 
   constructor: (current) ->
-    @current = current # to reference and save picker's settings
+    @current = current # to reference and save picker's options
     @$container = undefined # to hold the picker
     @startingDate = undefined # the start date to show
     @todayDate = new Date() # for today
@@ -33,9 +33,15 @@ class chronos.Picker
   # Insert picker into DOM after container element and animate
   insertAfter: ($element) ->
     $element.after(@$container)
-    # TODO: Position on screen
-    # animate
+    @setPosition()
     @animator.open()
+
+  # set the picker's position according to screen real estate or given
+  # position object expected to be in the form accepted by css method
+  setPosition: (position) ->
+    position = position || @_getPosition()
+    @$container.css(position).css(position: "absolute")
+
 
   ###
     Private Methods
@@ -184,6 +190,36 @@ class chronos.Picker
     if @pickedDateTime
       d = @dateFormatter.format(@pickedDateTime, @current.options.displayFormat)
       @$displayElement.val(d)
+
+  # Calculate the position on the screen at which to place the picker
+  _getPosition: ->
+    position =
+      left: @$displayElement.offset().left + @current.options.positionOffset.left
+      top: @$displayElement.offset().top + @current.options.positionOffset.top
+    docHeight = $(window).height()
+    scrollTop = $(window).scrollTop()
+    pickerHeight = @$container.outerHeight()
+    lowerDifference = Math.abs(docHeight - position.top + @$displayElement.outerHeight())
+    upperDifference = position.top + scrollTop
+    displayBelow = lowerDifference > pickerHeight
+    displayAbove = upperDifference > pickerHeight
+
+    console.log position, docHeight, scrollTop, pickerHeight, lowerDifference, upperDifference, displayBelow, displayAbove
+
+    if not displayAbove && not displayBelow
+      position.top = docHeight / 2 - pickerHeight / 2
+      if (docHeight + scrollTop < pickerHeight)
+        console.warn("chronos: Not enough room to display date picker.")
+    else if displayBelow
+      # display below takes priority over display above
+      position.top += @$displayElement.outerHeight()
+    else
+      # display at offset above visual element
+      position.top -= pickerHeight
+
+    position
+
+
 
 
   ###

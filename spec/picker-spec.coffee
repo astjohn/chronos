@@ -46,6 +46,54 @@ describe "Picker", ->
         expect(p.animator.close).toHaveBeenCalled()
 
 
+    describe "#insertAfter", ->
+      element = {}
+      beforeEach ->
+        spyOn(p.animator, 'open')
+        spyOn(p, 'setPosition')
+        element =
+          after: "whatever"
+        spyOn(element, 'after')
+
+      it "places the picker after the given element", ->
+        p.insertAfter(element)
+        expect(element.after).toHaveBeenCalledWith(p.$container)
+
+      it "calls #setPosition", ->
+        p.insertAfter(element)
+        expect(p.setPosition).toHaveBeenCalled()
+
+      it "calls #open on the animator", ->
+        p.insertAfter(element)
+        expect(p.animator.open).toHaveBeenCalled()
+
+
+    describe "#setPosition", ->
+      chain =
+        css: "jquery chain mock"
+      beforeEach ->
+        spyOn(chain, 'css')
+        spyOn(p.$container, 'css').andReturn(chain)
+
+      it "should set the position to absolute", ->
+        spyOn(p, '_getPosition')
+        p.setPosition()
+        expect(chain.css).toHaveBeenCalledWith({position: 'absolute'})
+
+      describe "without given position", ->
+        it "should call #_getPosition", ->
+          spyOn(p, '_getPosition')
+          p.setPosition()
+          expect(p._getPosition).toHaveBeenCalled()
+
+      describe "when given a position", ->
+        it "should use the position", ->
+          pos = {top: 30, left: 50}
+          p.setPosition(pos)
+          expect(p.$container.css).toHaveBeenCalledWith(pos)
+
+
+
 
   describe "private methods", ->
 
@@ -380,6 +428,10 @@ describe "Picker", ->
         it "does not update the display element", ->
           p._updateValueElement()
           expect(p.$valueElement.val()).toEqual("")
+
+
+    describe "#_getPosition", ->
+      pending
 
 
     describe "events", ->

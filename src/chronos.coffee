@@ -38,6 +38,7 @@ class chronos.Chronos
     pickedDateTime: null # start datepicker at a specific date
     useTimePicker: false # set to true to be able to set time with date
     animations: {}
+    positionOffset: {top: 0, left: 0} # offset to adjust position of picker
     debug: false
 
   @events: ['opened', 'closed', 'daySelected', 'previousMonthFinished',
@@ -144,9 +145,6 @@ class chronos.Chronos
       'internal_close': (event) =>
         @_onClose(event)
     picker
-
-
-
 
   # place the settings into the expiredPickers array
   _expirePicker: ->
