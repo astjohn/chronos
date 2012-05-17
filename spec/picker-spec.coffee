@@ -92,6 +92,10 @@ describe "Picker", ->
           p.setPosition(pos)
           expect(p.$container.css).toHaveBeenCalledWith(pos)
 
+        it "should not call #_getPosition", ->
+          spyOn(p, '_getPosition')
+          p.setPosition({top: 20, left: 50})
+          expect(p._getPosition).not.toHaveBeenCalled()
 
 
 
@@ -430,8 +434,79 @@ describe "Picker", ->
           expect(p.$valueElement.val()).toEqual("")
 
 
+    describe "#_getWindowHeight", ->
+    describe "#_getScrollTop", ->
+      # TODO: How to spy on $(whatever) objects?
+
+
     describe "#_getPosition", ->
-      pending
+      dePosition = {}
+      deOuterHeight = {}
+      docHeight = {}
+      pickerHeight = {}
+      beforeEach ->
+        deOuterHeight = 16
+        pickerHeight = 150
+        p.current.options =
+          positionOffset:
+            top: 0
+            left: 0
+        spyOn(p.$displayElement, 'outerHeight').andReturn(deOuterHeight)
+        spyOn(p.$container, 'outerHeight').andReturn(pickerHeight)
+
+      describe "for above and below", ->
+        beforeEach ->
+          dePosition =
+            top: 200
+            left: 10
+          spyOn(p.$displayElement, 'offset').andReturn(dePosition)
+
+        describe "when there is enough room to display below", ->
+          # Picker @ 200 + height @ 150 = 350 vs. 1000
+          it "sets position top to just below the displayElement", ->
+            spyOn(p, '_getWindowHeight').andReturn(1000)
+            spyOn(p, '_getScrollTop').andReturn(20)
+            f = p._getPosition()
+            expect(f.top).toEqual(dePosition.top + deOuterHeight)
+
+        describe "when there is only room to display above", ->
+          # Picker @ 200 + height @ 150 = 350 vs. 1000
+          it "sets the position top to above the displayElement", ->
+            spyOn(p, '_getWindowHeight').andReturn(200)
+            spyOn(p, '_getScrollTop').andReturn(0)
+            f = p._getPosition()
+            expect(f.top).toEqual(dePosition.top - p.$container.outerHeight())
+
+      describe "not above or below", ->
+        beforeEach ->
+          dePosition =
+            top: 100
+            left: 10
+          spyOn(p.$displayElement, 'offset').andReturn(dePosition)
+
+        describe "when there is not enough room for above or below", ->
+          it "sets the picker in the center of the available vertical", ->
+            # Picker @ 100 but its height is 150. vs 200 vertical
+            spyOn(p, '_getWindowHeight').andReturn(200)
+            spyOn(p, '_getScrollTop').andReturn(0)
+            f = p._getPosition()
+            expect(f.top).toEqual(200 / 2 - 150 / 2)
+
+        describe "when there is not enough room at all", ->
+          beforeEach ->
+            # Picker @ 100 but its height is 150. vs 75 vertical
+            spyOn(p, '_getWindowHeight').andReturn(75)
+            spyOn(p, '_getScrollTop').andReturn(0)
+
+          it "sets the picker in the center of the available vertical", ->
+            f = p._getPosition()
+            expect(f.top).toEqual(75 / 2 - 150 / 2)
+
+          it "displays a console warning", ->
+            spyOn(console, 'warn')
+            f = p._getPosition()
+            expect(console.warn).toHaveBeenCalled()
+
 
 
     describe "events", ->

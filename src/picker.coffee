@@ -191,20 +191,26 @@ class chronos.Picker
       d = @dateFormatter.format(@pickedDateTime, @current.options.displayFormat)
       @$displayElement.val(d)
 
+  # Return the window height
+  _getWindowHeight: ->
+    $(window).height()
+
+  # Return the window's scroll length
+  _getScrollTop: ->
+    $(window).scrollTop()
+
   # Calculate the position on the screen at which to place the picker
   _getPosition: ->
     position =
       left: @$displayElement.offset().left + @current.options.positionOffset.left
       top: @$displayElement.offset().top + @current.options.positionOffset.top
-    docHeight = $(window).height()
-    scrollTop = $(window).scrollTop()
+    docHeight = @_getWindowHeight()
+    scrollTop = @_getScrollTop()
     pickerHeight = @$container.outerHeight()
     lowerDifference = Math.abs(docHeight - position.top + @$displayElement.outerHeight())
     upperDifference = position.top + scrollTop
     displayBelow = lowerDifference > pickerHeight
     displayAbove = upperDifference > pickerHeight
-
-    console.log position, docHeight, scrollTop, pickerHeight, lowerDifference, upperDifference, displayBelow, displayAbove
 
     if not displayAbove && not displayBelow
       position.top = docHeight / 2 - pickerHeight / 2
@@ -232,12 +238,10 @@ class chronos.Picker
 
   # Handle previous button clicks
   _onPrevious: (event) ->
-    console.log "previous!", event
     @animator.previousMonth()
 
   # Handle next button clicks
   _onNext: (event) ->
-    console.log "next!", event
     @animator.nextMonth()
 
   # Handle day selection
