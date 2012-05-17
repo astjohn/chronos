@@ -39,6 +39,26 @@ describe "Picker", ->
 
   describe "public methods", ->
 
+    describe "#render", ->
+      it "renders years when @mode is 'year'", ->
+        spyOn(p, "_renderYears")
+        p.mode = 'year'
+        p.render()
+        expect(p._renderYears).toHaveBeenCalled()
+
+      it "renders time when @mode is 'time", ->
+        spyOn(p, "_renderTime")
+        p.mode = 'time'
+        p.render()
+        expect(p._renderTime).toHaveBeenCalled()
+
+      it "renders months otherwise", ->
+        spyOn(p, "_renderMonths")
+        p.mode = null
+        p.render()
+        expect(p._renderMonths).toHaveBeenCalled()
+
+
     describe "#close", ->
       it "calls the animator's close method", ->
         spyOn(p.animator, 'close')
@@ -160,6 +180,7 @@ describe "Picker", ->
         spyOn(p, '_initializeContainer')
         spyOn(p, '_initializeAnimator')
         spyOn(p, '_setStartingDate')
+        spyOn(p, '_setInitialMode')
 
       it "should call #_initializeContainer", ->
         p.constructor(current)
@@ -173,6 +194,10 @@ describe "Picker", ->
         p.constructor(current)
         expect(p._setStartingDate).toHaveBeenCalled()
 
+      it "should call #_setInitialMode", ->
+        p.constructor(current)
+        expect(p._setInitialMode).toHaveBeenCalled()
+
 
     describe "#_initializeAnimator", ->
       beforeEach ->
@@ -185,6 +210,45 @@ describe "Picker", ->
       it "should tell the animator which picker to use", ->
         p._initializeAnimator()
         expect(p.animator.$picker).toBe(p.$container)
+
+
+    describe "#_setInitialMode", ->
+      describe "for time picker", ->
+        it "sets the mode to 'time' if options are good", ->
+          p.current.options.useTimePicker = true
+          p.current.options.timePickerOnly = true
+          p._setInitialMode()
+          expect(p.mode).toEqual('time')
+
+        it "does not set the mode to 'time' if missing useTimePicker option", ->
+          p.current.options.useTimePicker = undefined
+          p.current.options.timePickerOnly = true
+          p._setInitialMode()
+          expect(p.mode).not.toEqual('time')
+
+        it "does not set the mode to 'time' if missing timePickerOnly", ->
+          p.current.options.useTimePicker = true
+          p.current.options.timePickerOnly = undefined
+          p._setInitialMode()
+          expect(p.mode).not.toEqual('time')
+
+      describe "for years only", ->
+        it "sets the mode to 'year' if given yearOnly option", ->
+          p.current.options.yearOnly = true
+          p._setInitialMode()
+          expect(p.mode).toEqual('year')
+
+        it "does not set the mode to 'year' if missing yearOnly", ->
+          p.current.options.yearOnly = undefined
+          p._setInitialMode()
+          expect(p.mode).not.toEqual('year')
+
+      describe "otherwise", ->
+        it "sets mode to 'month", ->
+          p.current.options.yearOnly = undefined
+          p.current.options.useTimePicker = undefined
+          p._setInitialMode()
+          expect(p.mode).toEqual('month')
 
 
     describe "#_initializeContainer", ->
@@ -263,7 +327,13 @@ describe "Picker", ->
           expect(p.startingDate.valueOf()).toEqual(min.valueOf())
 
 
+
+
+
     describe "#_renderYears", ->
+      pending
+
+    describe "#_renderTime", ->
       pending
 
 

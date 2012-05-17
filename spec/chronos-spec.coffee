@@ -11,7 +11,7 @@ describe "Chronos", ->
     describe "initialize", ->
       it "sets a mousedown event on the document so it knows when to close a picker", ->
         spyOn(c, '_externalClickClose')
-        $(input).mousedown()
+        $(document).trigger('mousedown')
         expect(c._externalClickClose).toHaveBeenCalled()
 
     describe "#setCurrentElement", ->
@@ -121,17 +121,55 @@ describe "Chronos", ->
         expect(c.current.displayElement).toBe($de[0])
 
     describe "#_createPicker", ->
+      beforeEach ->
+        c.current =
+          valueElement: $("<input />")
+          options: chronos.Chronos._defaultOptions
+          displayElement: $("<input />")
+
+      it "creates a new picker", ->
+        c.current.activePicker = undefined
+        c._createPicker()
+        expect(c.current.activePicker).not.toEqual(undefined)
+
+      it "binds the picker's 'internal_close event", ->
+        spyOn(c, '_onClose')
+        c._createPicker()
+        c.current.activePicker.$container.trigger('internal_close')
+        expect(c._onClose).toHaveBeenCalled()
+
+      it "returns the picker", ->
+        expect(c._createPicker()).toBe(c.current.activePicker)
+
 
     describe "#_renderPicker", ->
-      pending
+      picker = newDefaultPicker()
+      beforeEach ->
+        c.current =
+          valueElement: $(input)
+          options: chronos.Chronos._defaultOptions
+          displayElement: $("<div />")
+        c.current.activePicker = picker
+
+      it "creates the picker if there isn't one", ->
+        c.current.activePicker = undefined
+        spyOn(c, '_createPicker').andCallThrough()
+        c._renderPicker()
+        expect(c._createPicker).toHaveBeenCalled()
+
+      it "renders the picker", ->
+        spyOn(c, '_createPicker')
+        spyOn(c.current.activePicker, 'render')
+        c._renderPicker()
+        expect(c.current.activePicker.render).toHaveBeenCalled()
+
+      it "inserts the picker after the display element", ->
+        spyOn(c, '_createPicker')
+        spyOn(c.current.activePicker, 'insertAfter')
+        c._renderPicker()
+        expect(c.current.activePicker.insertAfter).toHaveBeenCalledWith($(c.current.displayElement))
 
 
-    #   _findPickerFromEvent: (event) ->
-    # $target = $(event.target)
-    # $picker = if $target.hasClass('chronos_picker')
-    #   $target
-    # else
-    #   $target.parents('.chronos_picker')
     describe "#_findPickerFromEvent", ->
       picker = "<div class='chronos_picker' />"
       monthBody = "<div class='monthBody'></div>"

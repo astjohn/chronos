@@ -28,7 +28,6 @@ class chronos.Chronos
     pmAbbrUpper: 'P'
     startBlank: false
     displayFormat: 'default'
-    timePicker: true
     valueFormat: 'U' # number of millisecond since midnight January 1, 1970
     yearsPerPage: 20
     maxDate: null
@@ -37,6 +36,8 @@ class chronos.Chronos
                  # layout, since the days on the right might have a different margin
     pickedDateTime: null # start datepicker at a specific date
     useTimePicker: false # set to true to be able to set time with date
+    timePickerOnly: false # only use a time picker
+    yearOnly: false # only use yearly selection
     animations: {}
     positionOffset: {top: 0, left: 0} # offset to adjust position of picker
     debug: false
@@ -128,10 +129,7 @@ class chronos.Chronos
   # Construct a date picker and render it
   _renderPicker: ->
     @_createPicker() unless @current.activePicker
-
-
-    # TODO: TEMPORARY
-    @current.activePicker._renderMonths()
+    @current.activePicker.render()
     @current.activePicker.insertAfter($(@current.displayElement))
     @current.activePicker
 

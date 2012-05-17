@@ -4,6 +4,7 @@ class chronos.Picker
     @current = current # to reference and save picker's options
     @$container = undefined # to hold the picker
     @startingDate = undefined # the start date to show
+    @mode = undefined # the mode to render, i.e. months, years, time, etc.
     @todayDate = new Date() # for today
     @pickedDateTime = current.pickedDateTime
     @$valueElement = $(current.valueElement)
@@ -20,6 +21,16 @@ class chronos.Picker
   ###
     Public Methods
   ###
+
+  # render according to @mode value
+  render: ->
+    switch @mode
+      when 'year'
+        @_renderYears()
+      when 'time'
+        @_renderTime()
+      else
+        @_renderMonths()
 
   # This method animated the close event and then triggers the removal of the picker
   # from the DOM.
@@ -53,6 +64,7 @@ class chronos.Picker
     # to animate the datepicker
     @_initializeAnimator()
     @_setStartingDate()
+    @_setInitialMode()
 
   _initializeContainer: ->
     @$container = @_createContainer()
@@ -66,6 +78,32 @@ class chronos.Picker
     @animator.setPicker(@$container)
     @animator
 
+  # Determines the 'mode' to render for the picker
+  # i.e. months, years, time, etc.
+  _setInitialMode: ->
+    if @current.options.useTimePicker && @current.options.timePickerOnly
+      @mode = 'time'
+    else if @current.options.yearOnly
+      @mode = 'year'
+    else
+      @mode = 'month'
+
+  # sets the picker's working date
+  _setStartingDate: ->
+    if @current.options.maxDate != null || @current.options.minDate != null
+
+      # if today is past the max date, then set the working date to the max
+      if @current.options.maxDate && (@todayDate.valueOf() > @current.options.maxDate.valueOf())
+        @startingDate = new Date(@current.options.maxDate.valueOf())
+
+      # if today is before the min date, then set the working date to the min
+      if @current.options.minDate && (@todayDate.valueOf() < @current.options.minDate.valueOf())
+        @startingDate = new Date(@current.options.minDate.valueOf())
+
+    # set the working date to today (but a separate object) if still undefined
+    if @startingDate == undefined
+      @startingDate = new Date(@todayDate.valueOf())
+    @startingDate
 
   # returns container div for picker
   _createContainer: ->
@@ -106,24 +144,15 @@ class chronos.Picker
   _renderTitle: (titleStr) ->
     @$container.find('.titleText').html(titleStr)
 
-  # fill the picker's body with a range of years to select from
   _renderYears: ->
+    # TODO
 
-
-    # while(this.current.working_date.getFullYear() % this.current.settings.yearsPerPage > 0) {
-    #   this.current.working_date.setFullYear(this.current.working_date.getFullYear() - 1);
-    # }
-
-            # this._renderTitle(this.current.working_date.getFullYear() + '-' +
-        #     (this.current.working_date.getFullYear() + this.current.settings.yearsPerPage - 1));
-
-    #@_renderTitle("#{workingDate.getFullYear()} - #{workingDate.getFullYear + @current.options.yearsPerPage - 1}")
-
-
+  _renderTime: ->
+    # TODO
 
   # fill the picker's body with a range of months to select from
   _renderMonths: ->
-    start = @pickedDateTime || @startingDate # use pickedDateTime over dtartingDate
+    start = @pickedDateTime || @startingDate # use pickedDateTime over startingDate
     @_buildMonth(start, @$container.find(".body_curr"))
     # set title to current month
     @_renderTitle(@$container.find(".body_curr").find(".monthBody").attr('data-date_title'))
@@ -152,23 +181,6 @@ class chronos.Picker
     d = new Date(date.valueOf())
     d.setMonth(d.getMonth() + value)
     d
-
-  # sets the picker's working date
-  _setStartingDate: ->
-    if @current.options.maxDate != null || @current.options.minDate != null
-
-      # if today is past the max date, then set the working date to the max
-      if @current.options.maxDate && (@todayDate.valueOf() > @current.options.maxDate.valueOf())
-        @startingDate = new Date(@current.options.maxDate.valueOf())
-
-      # if today is before the min date, then set the working date to the min
-      if @current.options.minDate && (@todayDate.valueOf() < @current.options.minDate.valueOf())
-        @startingDate = new Date(@current.options.minDate.valueOf())
-
-    # set the working date to today (but a separate object) if still undefined
-    if @startingDate == undefined
-      @startingDate = new Date(@todayDate.valueOf())
-    @startingDate
 
   # Save View Element's Settings
   _saveSettings: ->
@@ -254,7 +266,7 @@ class chronos.Picker
       # let Chronos manage closing picker, this event is not passed to the valueElement
       @$container.trigger('internal_close')
     else
-      # TODO
+      # TODO - pick time
 
   # Bind all container (picker) events to valueElement for easy access
   _bindContainerEvents: ->
