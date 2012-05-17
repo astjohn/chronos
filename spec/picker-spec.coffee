@@ -58,6 +58,11 @@ describe "Picker", ->
         p.render()
         expect(p._renderMonths).toHaveBeenCalled()
 
+      it "calls #_emptyBody", ->
+        spyOn(p, "_emptyBody")
+        p.render()
+        expect(p._emptyBody).toHaveBeenCalled()
+
 
     describe "#close", ->
       it "calls the animator's close method", ->
@@ -117,6 +122,68 @@ describe "Picker", ->
           p.setPosition({top: 20, left: 50})
           expect(p._getPosition).not.toHaveBeenCalled()
 
+
+    describe "setDate", ->
+      beforeEach ->
+        spyOn(p, '_saveDate')
+        spyOn(p, '_updateInputValues')
+
+      describe "when given an invalid date", ->
+        it "doesn't do anything", ->
+          p.setDate("not valid")
+          expect(p._saveDate).not.toHaveBeenCalled()
+
+      describe "when given a valid date", ->
+        d = {}
+        beforeEach ->
+          d = new Date()
+          p.setDate(d)
+
+        it "saves the date", ->
+          expect(p._saveDate).toHaveBeenCalledWith(d)
+
+        it "calls _updateInputValues", ->
+          expect(p._updateInputValues).toHaveBeenCalled()
+
+
+    describe "checkAndSetDate", ->
+
+      describe "when invalid date", ->
+        beforeEach ->
+          spyOn(p.dateFormatter, 'unformat').andReturn(false)
+
+        it "triggers the 'invalidDate event", ->
+          spyOn(p.$container, 'trigger')
+          p.checkAndSetDate()
+          expect(p.$container.trigger).toHaveBeenCalledWith('invalidDate')
+
+      describe "when valid date", ->
+        d = {}
+        beforeEach ->
+          d = new Date()
+          spyOn(p.dateFormatter, 'unformat').andReturn(d)
+          spyOn(p, '_saveDate')
+          spyOn(p, '_updateValueElement')
+          spyOn(p.$container, 'trigger')
+          spyOn(p, 'render')
+          p.checkAndSetDate()
+
+        it "saves the date", ->
+          expect(p._saveDate).toHaveBeenCalledWith(d)
+
+        it "updates the value element", ->
+          expect(p._updateValueElement).toHaveBeenCalled()
+
+        it "triggers the 'validDate' event", ->
+          expect(p.$container.trigger).toHaveBeenCalledWith('validDate')
+
+        it "re-renders the picker", ->
+          expect(p.render).toHaveBeenCalled()
+
+      it "calls unformat on the dateFormatter to try to create a date", ->
+        spyOn(p.dateFormatter, 'unformat').andReturn(false)
+        p.checkAndSetDate()
+        expect(p.dateFormatter.unformat).toHaveBeenCalled()
 
 
   describe "private methods", ->
@@ -268,6 +335,19 @@ describe "Picker", ->
         p.constructor(current)
         expect(p.$container.find(".body").length).toBeGreaterThan(0) # duck type
 
+
+    describe "#_emptyBody", ->
+      beforeEach ->
+        p.$container = $("<div><div class='body_curr'>text</div>
+                         <div class='body_next'>text</div>
+                         <div class='body_prev'>text</div>")
+        p._emptyBody()
+      it "should empty the 'body_curr' div", ->
+        expect(p.$container.find('.body_curr').html()).toEqual("")
+      it "should empty the 'body_next' div", ->
+        expect(p.$container.find('.body_next').html()).toEqual("")
+      it "should empty the 'body_prev' div", ->
+        expect(p.$container.find('.body_prev').html()).toEqual("")
 
     describe "#_renderTitle", ->
       it "should replace the title text", ->

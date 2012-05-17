@@ -24,6 +24,7 @@ class chronos.Picker
 
   # render according to @mode value
   render: ->
+    @_emptyBody()
     switch @mode
       when 'year'
         @_renderYears()
@@ -53,6 +54,27 @@ class chronos.Picker
     position = position || @_getPosition()
     @$container.css(position).css(position: "absolute")
 
+  # set the display and value element's date and save settings
+  setDate: (date) ->
+    if $.isFunction(date.getMonth) # check valid date
+      @_saveDate(date)
+      @_updateInputValues()
+
+  # This method will check for a valid date within the displayElement after a keypress
+  # handled within Chronos' _onDisplayKeyPress.
+  # If the date is valid, it will set the valueElement's value and trigger the
+  # 'validDate' event.  Otherwise, it will trigger the 'invalidDate' event.
+  checkAndSetDate: ->
+    date = @dateFormatter.unformat(@$displayElement.val(), @current.options.typedInputFormat)
+    unless date == false
+      @_saveDate(date)
+      @_updateValueElement()
+      @$container.trigger('validDate')
+      @render() # re-render picker to instantly show chosen value
+    else
+      @$container.trigger('invalidDate')
+
+
 
   ###
     Private Methods
@@ -77,6 +99,12 @@ class chronos.Picker
     @animator = new chronos.Animator(@, @current.options.animations)
     @animator.setPicker(@$container)
     @animator
+
+  # save the given date
+  _saveDate: (date) ->
+    @pickedDateTime = date
+    @current.pickedDateTime = date
+    @_saveSettings()
 
   # Determines the 'mode' to render for the picker
   # i.e. months, years, time, etc.
@@ -139,6 +167,12 @@ class chronos.Picker
     body.append($('<div class="body_prev">'))
         .append($('<div class="body_curr">'))
         .append($('<div class="body_next">'))
+
+  # Empty the panels
+  _emptyBody: ->
+    @$container.find(".body_curr").html("")
+    @$container.find(".body_prev").html("")
+    @$container.find(".body_next").html("")
 
   # set the picker's title to the given string
   _renderTitle: (titleStr) ->

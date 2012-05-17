@@ -120,6 +120,25 @@ describe "Chronos", ->
         $de = c._buildDisplayElement()
         expect(c.current.displayElement).toBe($de[0])
 
+      it "binds the 'focus' event", ->
+        spyOn(c, '_onFocus')
+        $de = c._buildDisplayElement()
+        $de.trigger('focus')
+        expect(c._onFocus).toHaveBeenCalled()
+
+      it "binds the 'keyup' event", ->
+        spyOn(c, '_onDisplayKeyUp')
+        $de = c._buildDisplayElement()
+        $de.trigger('keyup')
+        expect(c._onDisplayKeyUp).toHaveBeenCalled()
+
+      it "binds the 'keydown' event", ->
+        spyOn(c, '_onDisplayKeyDown')
+        $de = c._buildDisplayElement()
+        $de.trigger('keydown')
+        expect(c._onDisplayKeyDown).toHaveBeenCalled()
+
+
     describe "#_createPicker", ->
       beforeEach ->
         c.current =
@@ -295,19 +314,6 @@ describe "Chronos", ->
             c._externalClickClose()
             expect(c._directClose).not.toHaveBeenCalled()
 
-  # # Close datepicker if clicked anywhere in document except current picker or
-  # # current displayElement
-  # _externalClickClose: (event) ->
-  #   if @current
-  #     $picker = @_findPickerFromEvent(event)
-
-  #     # Close picker if we're clicking on a different picker somehow
-  #     # or if we're clicking elsewhere and there's an active picker
-  #     # Do not close if we're clicking on the currently active picker
-  #     @_directClose() if @_notActivePicker($picker) || @_noPickerButActive($picker)
-
-
-
 
     describe "#_expirePicker", ->
       activePicker = "mockActivePicker"
@@ -397,6 +403,16 @@ describe "Chronos", ->
           expect(c._isCurrentPicker(target)).toEqual(false)
 
 
+    describe "_checkAndSetDate", ->
+      describe "when user input is a valid date", ->
+        it "triggers the 'validDate' event", ->
+
+        it "calls setDate on the picker", ->
+
+      describe "when user input is not a valid date", ->
+        it "triggers the 'invalidDate' event", ->
+
+
   describe "events", ->
 
     describe "#_onFocus", ->
@@ -443,3 +459,25 @@ describe "Chronos", ->
       it "calls #_directClose", ->
         c._onClose(mock_event)
         expect(c._directClose).toHaveBeenCalled()
+
+    describe "#_onDisplayKeyUp", ->
+      beforeEach ->
+        c.current =
+          activePicker:
+            checkAndSetDate: jasmine.createSpy('picker')
+
+      it "calls #checkAndSetDate on the picker", ->
+        c._onDisplayKeyUp()
+        expect(c.current.activePicker.checkAndSetDate).toHaveBeenCalled()
+
+    describe "#_onDisplayKeyDown", ->
+      event = {}
+      beforeEach ->
+        c.current = {}
+
+      describe "when the enter key is pressed", ->
+        it "calls #_directClose", ->
+          event.keyCode = 13
+          spyOn(c, '_directClose')
+          c._onDisplayKeyDown(event)
+          expect(c._directClose).toHaveBeenCalled()

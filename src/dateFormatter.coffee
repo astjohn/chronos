@@ -28,7 +28,8 @@ class chronos.DateFormatter
 
   masks:
     default: "ddd mmm dd yyyy HH:MM:ss"
-    shortDate: "m/d/yy"
+    shortDate: "d/m/yy"
+    USshortDate: "m/d/yy"
     mediumDate: "mmm d, yyyy"
     longDate: "mmmm d, yyyy"
     fullDate: "dddd, mmmm d, yyyy"
@@ -40,18 +41,87 @@ class chronos.DateFormatter
     isoDateTime: "yyyy-mm-dd'T'HH:MM:ss"
     isoUtcDateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss'Z'"
 
+  token: /U{1}|d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g
+  timezone: /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g
+  timezoneClip: /[^-+\dA-Z]/g
+
+  pad: (val, len) ->
+    val = String(val)
+    len = len or 2
+    val = "0" + val  while val.length < len
+    val
+
+  newZeroDate: ->
+    d = new Date()
+    d.setDate(0)
+    d.setMonth(0)
+    d.setFullYear(0)
+    d.setHours(0)
+    d.setMinutes(0)
+    d.setSeconds(0)
+    d.setMilliseconds(0)
+    d
+
+  unformat: (dateStr, mask, utc) ->
+    # milliseconds, seconds, minutes, hours, day, month, year, timezone
+    dF = @
+
+    mask = String(dF.masks[mask] or mask or dF.masks["default"])
+    date = @newZeroDate()
+    date.setHours(0)
+    maskParts = mask.split(/\W+/)
+    dateParts = dateStr.split(/\W+/)
+    notCounter = 0
+
+    _ = (if utc then "setUTC" else "set")
+    __ = (if utc then "getUTC" else "get")
+
+    for i in [0..maskParts.length-1]
+      targetMask = maskParts[i]
+      target = dateParts[i]
+
+      switch (targetMask)
+        when 'd', 'dd' then date[_ + 'Date'](target)
+        when 'ddd', 'dddd' then null # do nothing
+        when 'm', 'mm' then date[_ + 'Month'](parseInt(target)-1)
+        when 'mmm' then date[_ + 'Month'](dF.i18n.monthNames.indexOf(target))
+        when 'mmmm' then date[_ + 'Month'](dF.i18n.monthNames.indexOf(target)-12)
+        #when 'yy'  # need full year so do not perform
+        when 'yyyy' then date[_ + 'FullYear'](target)
+        when 'h', 'hh' then date[_ + 'Hours'](target % 12 or 12) # add 12 hours if PM below
+        when 'H' , 'HH' then date[_ + 'Hours'](target)
+        when 'M' , 'MM' then date[_ + 'Minutes'](target)
+        when 's', 'ss' then date[_ + 'Seconds'](target)
+        when 'l' , 'L' then date[_ + 'Milliseconds'](target)
+        when 't'
+          if dF.i18n.pmAbbrLower == target
+            # need to add 12 hours to time
+            date[_ + 'Hours'](date[__ + 'Hours']() + 12)
+        when 'tt'
+          if dF.i18n.pmLower == target
+            # need to add 12 hours to time
+            date[_ + 'Hours'](date[__ + 'Hours']() + 12)
+        when 'T'
+          if dF.i18n.pmAbbrUpper == target
+            # need to add 12 hours to time
+            date[_ + 'Hours'](date[__ + 'Hours']() + 12)
+        when 'TT'
+          if dF.i18n.pmUpper == target
+            # need to add 12 hours to time
+            date[_ + 'Hours'](date[__ + 'Hours']() + 12)
+        when 'Z' then null # do not handle time zones
+        when 'U' then date[_ + 'Time'](target) # yeah, right.
+        else
+          notCounter += 1
+
+    if (notCounter > 0 || maskParts.length != dateParts.length)
+      false
+    else
+      date
+
   format: (date, mask, utc) ->
-    token = /U{1}|d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g
-    timezone = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g
-    timezoneClip = /[^-+\dA-Z]/g
-    pad = (val, len) ->
-      val = String(val)
-      len = len or 2
-      val = "0" + val  while val.length < len
-      val
     dF = @
     args = arguments
-
 
     # Regexes and supporting functions are cached through closure
     ( ->
@@ -83,35 +153,37 @@ class chronos.DateFormatter
 
       flags =
         d: d
-        dd: pad(d)
+        dd: dF.pad(d)
         ddd: dF.i18n.dayNames[D]
         dddd: dF.i18n.dayNames[D + 7]
         m: m + 1
-        mm: pad(m + 1)
+        mm: dF.pad(m + 1)
         mmm: dF.i18n.monthNames[m]
         mmmm: dF.i18n.monthNames[m + 12]
         yy: String(y).slice(2)
         yyyy: y
         h: H % 12 or 12
-        hh: pad(H % 12 or 12)
+        hh: dF.pad(H % 12 or 12)
         H: H
-        HH: pad(H)
+        HH: dF.pad(H)
         M: M
-        MM: pad(M)
+        MM: dF.pad(M)
         s: s
-        ss: pad(s)
-        l: pad(L, 3)
-        L: pad((if L > 99 then Math.round(L / 10) else L))
+        ss: dF.pad(s)
+        l: dF.pad(L, 3)
+        L: dF.pad((if L > 99 then Math.round(L / 10) else L))
         t: (if H < 12 then dF.i18n.amAbbrLower else dF.i18n.pmAbbrLower)
         tt: (if H < 12 then dF.i18n.amLower else dF.i18n.pmLower)
         T: (if H < 12 then dF.i18n.amAbbrUpper else dF.i18n.pmAbbrUpper)
         TT: (if H < 12 then dF.i18n.amUpper else dF.i18n.pmUpper)
-        Z: (if utc then "UTC" else (String(date).match(timezone) or [ "" ]).pop().replace(timezoneClip, ""))
-        o: (if o > 0 then "-" else "+") + pad(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4)
+        Z: (if utc then "UTC" else (String(date).match(dF.timezone) or [ "" ]).pop().replace(dF.timezoneClip, ""))
+        o: (if o > 0 then "-" else "+") + dF.pad(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4)
         S: [ "th", "st", "nd", "rd" ][(if d % 10 > 3 then 0 else (d % 100 - d % 10 isnt 10) * d % 10)]
         U: U
 
-      mask.replace token, ($0) ->
+      mask.replace dF.token, ($0) ->
         (if $0 of flags then flags[$0] else $0.slice(1, $0.length - 1))
     )()
+
+
 

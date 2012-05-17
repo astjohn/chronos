@@ -12,6 +12,8 @@ class chronos.Chronos
   @_defaultOptions:
     pickerClass: ''
 
+    # Note that order in the following arrays is important for date formatting.
+    # Use startDay option to offset the week's starting day for display in calendar.
     dayNames: [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sunday",
                 "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ]
     dayNamesAbbr: [ "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
@@ -27,8 +29,9 @@ class chronos.Chronos
     pmAbbrLower: 'p'
     pmAbbrUpper: 'P'
     startBlank: false
-    displayFormat: 'default'
-    valueFormat: 'U' # number of millisecond since midnight January 1, 1970
+    displayFormat: 'isoDate' # format to display after making selection through picker
+    typedInputFormat: 'isoDate' # format to allow user to manually type in value
+    valueFormat: 'U' # format to post to the server
     yearsPerPage: 20
     maxDate: null
     minDate: null
@@ -43,7 +46,7 @@ class chronos.Chronos
     debug: false
 
   @events: ['opened', 'closed', 'daySelected', 'previousMonthFinished',
-            'nextMonthFinished']
+            'nextMonthFinished', 'invalidDate', 'validDate']
 
 
   ###
@@ -51,7 +54,6 @@ class chronos.Chronos
   ###
 
   initialize: ->
-    # TODO: close on TAB key
     # close datepicker if clicked anywhere in document except current picker
     $(document).mousedown (event) =>
       @_externalClickClose(event)
@@ -119,6 +121,10 @@ class chronos.Chronos
     $displayElement.bind
       'focus':  (event) =>
         @_onFocus(event)
+      'keyup': (event) =>
+        @_onDisplayKeyUp(event)
+      'keydown': (event) =>
+        @_onDisplayKeyDown(event)
 
     $ve.before($displayElement) # place clone before valueElement
 
@@ -194,6 +200,7 @@ class chronos.Chronos
     @current.activePicker != null &&
     @current.activePicker.$displayElement[0] == target
 
+
   ###
     EVENT HANDLERS
   ###
@@ -212,6 +219,23 @@ class chronos.Chronos
   _onClose: (event) ->
     event.stopPropagation() # do not propagate 'internal_close' event
     @_directClose()
+
+
+  # This event allows a user to type into the display element instead of using
+  # the date picker or for accessibility control features
+  _onDisplayKeyUp: (event) ->
+    # TODO: Accessibility
+    @current.activePicker.checkAndSetDate()
+
+
+  # handle keydown on displayElement
+  _onDisplayKeyDown: (event) ->
+    # close on ENTER or TAB key
+    if event.keyCode == 13
+      @_directClose()
+      $(@current.displayElement).blur()
+
+    console.log event
 
 
 
