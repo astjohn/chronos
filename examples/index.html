@@ -26,12 +26,6 @@
 </section>
 
 <section>
-  <h2>With Time Picker</h2>
-  <code>$('#with_time_picker').chronos({useTimePicker: true});</code>
-  <input id="with_time_picker" name="with_time_picker" type="text" />
-</section>
-
-<section>
   <h2>With Maximum and Minimum Dates Set</h2>
   <p>Note the code below uses a Date object only to keep with the present date.</p>
   <code>var mind = new Date(),
@@ -44,31 +38,56 @@
 </section>
 
 <section>
-  <h2>With Time Picker Callbacks</h2>
+  <h2>With 'daySelected' Callback</h2>
   <p>Each picker uses callbacks to restrict the range of the sibling picker.</p>
-  <code>$('.time_picker_callbacks').chronos({timePicker: true});</code>
-  <label for="time_picker_callback1">
+  <code>$('.date_picker_callbacks').chronos().on('daySelected',
+  function(event, date, element) {
+    $target = $(event.target)
+    if ($target.attr('id') == "date_picker_callback1") {
+      $("#date_picker_callback2").chronos('setDateRange', {minDate: date})
+    } else {
+      $("#date_picker_callback1").chronos('setDateRange', {maxDate: date})
+    }
+  });</code>
+  <label for="date_picker_callback1">
     Departure:
   </label>
-  <input id="time_picker_callback1" class="time_picker_callbacks" type="text"
+  <input id="date_picker_callback1" class="date_picker_callbacks" type="text"
          data-tipe="departure" name="picker[departure]" />
-  <label for="time_picker_callback1">
+  <label for="date_picker_callback1">
     Arrival:
   </label>
-  <input id="time_picker_callback2" class="time_picker_callbacks" type="text"
+  <input id="date_picker_callback2" class="date_picker_callbacks" type="text"
          data-tipe="arrival" name="picker[arrival]"/>
+</section>
+
+<section>
+  <h2>With Annual Selection</h2>
+  <code>// TODO</code>
+  <p>TODO</p>
+</section>
+
+<section>
+  <h2>With Time Selection</h2>
+  <code>// TODO</code>
+  <p>TODO</p>
+</section>
+
+<section>
+  <h2>With Annual Only</h2>
+  <code>// TODO</code>
+  <p>TODO</p>
+</section>
+
+<section>
+  <h2>With Time Only</h2>
+  <code>// TODO</code>
+  <p>TODO</p>
 </section>
 
   <script type="text/javascript">
     // Basic
     var temp = $('#basic').chronos();
-
-    // $('#basic').on('close', fucntion(event) {
-    //   alert("CLOSE FROM VALUE ELEMENT");
-    // });
-
-    // With Time Picker
-    //$('#w_time_picker').chronos({timePicker: true});
 
     var mind = new Date(),
     maxd = new Date();
@@ -77,24 +96,15 @@
     $('#w_date_range').chronos({ minDate: mind, maxDate: maxd });
 
 
-    // $('.time_picker_callbacks').chronos({ timePicker: true,
-    //   format: 'j F Y @ h:iA',
-    //   inputOutputFormat: 'd-m-Y H:i:s',
-    //   onSelect: function(pickerObj, date) {
-    //     console.log("inside onselect callback");
-    //     var $el, $target;
-    //     $el = $(pickerObj.current.value_element)
-    //     if ($el.attr("data-tipe") === "departure") {
-    //       //$target = $el.siblings("[name]='picker[arrival]'");
-    //       $target = $("#time_picker_callback2");
-    //       console.log("T:", $target);
-    //       $target.chronos('setDateRange', {minDate: date});
-    //     } else {
-    //       $target = $el.siblings("[name]='picker[departure]'");
-    //       $target.chronos('setDateRange', {maxDate: date});
-    //     }
-    //   }
-    // });
+    $('.date_picker_callbacks').chronos().on('daySelected', function(event, date, element) {
+      $target = $(event.target)
+      if ($target.attr('id') == "date_picker_callback1") {
+        $("#date_picker_callback2").chronos('setDateRange', {minDate: date})
+      } else {
+        $("#date_picker_callback1").chronos('setDateRange', {maxDate: date})
+      }
+    });
+
 
   </script>
 </body>

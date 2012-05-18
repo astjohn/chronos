@@ -71,7 +71,12 @@ class chronos.Chronos
   #     minDate: Date()
   #     maxDate: Date()
   setDateRange: (range) ->
-    #console.log "WORKS"
+    if @current.activePicker
+      @current.activePicker.setDateRange(range)
+    else
+      @current.options.minDate = range.minDate
+      @current.options.maxDate = range.maxDate
+      @_saveCurrentSettings()
 
 
 

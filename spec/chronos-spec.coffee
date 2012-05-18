@@ -37,7 +37,39 @@ describe "Chronos", ->
         expect(c.current).toBe(newSettings)
 
     describe "#setDateRange", ->
-      pending
+      it "calls setDateRange on the picker if there is an active picker", ->
+        c.current =
+          activePicker:
+            setDateRange: "whatever"
+        range = "something"
+        spyOn(c.current.activePicker, 'setDateRange')
+        c.setDateRange(range)
+        expect(c.current.activePicker.setDateRange).toHaveBeenCalledWith(range)
+
+      describe "when there is not an active picker", ->
+        range = {}
+        beforeEach ->
+          c.current =
+            activePicker: undefined
+            options:
+              minDate: undefined
+              maxDate: undefined
+          range =
+            maxDate: "max"
+            minDate: "min"
+          spyOn(c, '_saveCurrentSettings')
+
+        it "sets the minDate", ->
+          c.setDateRange(range)
+          expect(c.current.options.minDate).toEqual("min")
+
+        it "sets the maxDate", ->
+          c.setDateRange(range)
+          expect(c.current.options.maxDate).toEqual("max")
+
+        it "saves the current settings", ->
+          c.setDateRange(range)
+          expect(c._saveCurrentSettings).toHaveBeenCalled()
 
 
   describe "private methods", ->

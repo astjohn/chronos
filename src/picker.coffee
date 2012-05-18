@@ -74,6 +74,22 @@ class chronos.Picker
     else
       @$container.trigger('invalidDate')
 
+  setDateRange: (range) ->
+    if range.minDate
+      if @_isValidDate(range.minDate)
+        @current.options.minDate = range.minDate
+        @_saveSettings()
+      else
+        console.warn("chronos: Invalid minDate")
+
+    if range.maxDate
+      if @_isValidDate(range.maxDate)
+        @current.options.maxDate = range.maxDate
+        @_saveSettings()
+      else
+        console.warn("chronos: Invalid maxDate")
+    @render() # re-render picker for new ranges
+
 
 
   ###
@@ -277,6 +293,9 @@ class chronos.Picker
 
     position
 
+  # Return true if given a valid date
+  _isValidDate: (d) ->
+    Object.prototype.toString.call(d) == '[object Date]'
 
 
 
@@ -312,13 +331,15 @@ class chronos.Picker
   _bindContainerEvents: ->
     for eventType in chronos.Chronos.events
       @$container.on(eventType, (event) =>
-        @_passEvents(event, arguments)
+        a = Array.prototype.slice.apply(arguments)
+        @_passEvents(event, a.slice(1, a.length))
       )
 
   # responsible for passing all events to the valueElement for convenience and
   # to obey law of demeter. i.e. events should occur on valueElement and other objects
   # should be isolated from valueElement
   _passEvents: (event, args) ->
+    #console.log "HERE", event.type, args.slice(1, args.length)
     event.stopPropagation()
     @$valueElement.trigger(event.type, args)
 

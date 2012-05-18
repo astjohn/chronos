@@ -186,6 +186,90 @@ describe "Picker", ->
         expect(p.dateFormatter.unformat).toHaveBeenCalled()
 
 
+    describe "setDateRange", ->
+      beforeEach ->
+        p.current.options =
+          minDate: undefined
+          maxDate: undefined
+        spyOn(p, 'render')
+
+      it "calls @render", ->
+        p.setDateRange("whatever")
+        expect(p.render).toHaveBeenCalled()
+
+      describe "when given nonsense", ->
+        beforeEach ->
+          p.setDateRange("what?")
+
+        it "does not set the minDate", ->
+          expect(p.current.options.minDate).toEqual(undefined)
+
+        it "does not set the maxDate", ->
+          expect(p.current.options.minDate).toEqual(undefined)
+
+      describe "when given a minDate", ->
+        d = new Date()
+        range = {}
+        beforeEach ->
+          range =
+            minDate: d
+
+        it "sets the minDate if valid", ->
+          spyOn(p, '_isValidDate').andReturn(true)
+          spyOn(p, '_saveSettings')
+          p.setDateRange(range)
+          expect(p.current.options.minDate.valueOf()).toEqual(d.valueOf())
+
+        it "saves the settings if valid", ->
+          spyOn(p, '_isValidDate').andReturn(true)
+          spyOn(p, '_saveSettings')
+          p.setDateRange(range)
+          expect(p._saveSettings).toHaveBeenCalled()
+
+        it "does not set the minDate if not valid", ->
+          spyOn(p, '_isValidDate').andReturn(false)
+          p.setDateRange(range)
+          expect(p.current.options.minDate).toEqual(undefined)
+
+        it "displays a console warning if minDate is not valid", ->
+          spyOn(p, '_isValidDate').andReturn(false)
+          spyOn(console, 'warn')
+          p.setDateRange(range)
+          expect(console.warn).toHaveBeenCalled()
+
+      describe "when given a maxDate", ->
+        d = new Date()
+        range = {}
+        beforeEach ->
+          range =
+            maxDate: d
+
+        it "sets the maxDate if valid", ->
+          spyOn(p, '_isValidDate').andReturn(true)
+          spyOn(p, '_saveSettings')
+          p.setDateRange(range)
+          expect(p.current.options.maxDate.valueOf()).toEqual(d.valueOf())
+
+        it "saves the settings if valid", ->
+          spyOn(p, '_isValidDate').andReturn(true)
+          spyOn(p, '_saveSettings')
+          p.setDateRange(range)
+          expect(p._saveSettings).toHaveBeenCalled()
+
+        it "does not set the maxDate if not valid", ->
+          spyOn(p, '_isValidDate').andReturn(false)
+          p.setDateRange(range)
+          expect(p.current.options.maxDate).toEqual(undefined)
+
+        it "displays a console warning if maxDate is not valid", ->
+          spyOn(p, '_isValidDate').andReturn(false)
+          spyOn(console, 'warn')
+          p.setDateRange(range)
+          expect(console.warn).toHaveBeenCalled()
+
+
+
+
   describe "private methods", ->
 
     describe "#_createContainer", ->
@@ -687,6 +771,13 @@ describe "Picker", ->
             f = p._getPosition()
             expect(console.warn).toHaveBeenCalled()
 
+
+    describe "#_isValidDate", ->
+      it "returns true if given a date object", ->
+        expect(p._isValidDate(new Date())).toEqual(true)
+
+      it "returns false if given a different type of object", ->
+        expect(p._isValidDate({whatever: "something"})).toEqual(false)
 
 
     describe "events", ->
