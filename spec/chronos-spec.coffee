@@ -272,6 +272,32 @@ describe "Chronos", ->
           expect(c._noPickerButActive($picker)).toEqual(false)
 
 
+    describe "#_notActiveDisplay", ->
+
+      it "returns false if there is no activePicker", ->
+        c.current =
+          activePicker: null
+        expect(c._notActiveDisplay()).toEqual(true)
+
+      it "returns true if there is an active picker but displayElement is not a match", ->
+        event =
+          target: "not a match"
+        $target = $("<div class='target'>")
+        c.current =
+          activePicker:
+            $displayElement: $target
+        expect(c._notActiveDisplay(event)).toEqual(true)
+
+      it "returns false if there is an active picker and its displayElement matches", ->
+        $target = $("<div class='target'>")
+        event =
+          target: $target[0]
+        c.current =
+          activePicker:
+            $displayElement: $target
+        expect(c._notActiveDisplay(event)).toEqual(false)
+
+
     describe "#_externalClickClose", ->
 
       it "does not call #_directClose if there are not current settings", ->
@@ -285,6 +311,12 @@ describe "Chronos", ->
           c.current = {}
           spyOn(c, '_findPickerFromEvent')
           spyOn(c, '_directClose')
+
+        it "does not call #_directClose if it is the active displayElement", ->
+          c.current = {}
+          spyOn(c, '_notActiveDisplay').andReturn(false)
+          c._externalClickClose()
+          expect(c._directClose).not.toHaveBeenCalled()
 
         describe "when given a picker", ->
           beforeEach ->
@@ -403,16 +435,6 @@ describe "Chronos", ->
           expect(c._isCurrentPicker(target)).toEqual(false)
 
 
-    describe "_checkAndSetDate", ->
-      describe "when user input is a valid date", ->
-        it "triggers the 'validDate' event", ->
-
-        it "calls setDate on the picker", ->
-
-      describe "when user input is not a valid date", ->
-        it "triggers the 'invalidDate' event", ->
-
-
   describe "events", ->
 
     describe "#_onFocus", ->
@@ -470,14 +492,46 @@ describe "Chronos", ->
         c._onDisplayKeyUp()
         expect(c.current.activePicker.checkAndSetDate).toHaveBeenCalled()
 
+
     describe "#_onDisplayKeyDown", ->
       event = {}
-      beforeEach ->
-        c.current = {}
+      keys = {}
+      v = ""
 
-      describe "when the enter key is pressed", ->
-        it "calls #_directClose", ->
-          event.keyCode = 13
-          spyOn(c, '_directClose')
-          c._onDisplayKeyDown(event)
-          expect(c._directClose).toHaveBeenCalled()
+      beforeEach ->
+        c.current =
+          activePicker:
+            $displayElement: $("<div />")
+        spyOn(c, '_directClose')
+        spyOn(c.current.activePicker.$displayElement, 'blur')
+
+      it "calls #_directClose when the 'ENTER' key is pressed", ->
+        event.keyCode = 13
+        c._onDisplayKeyDown(event)
+        expect(c._directClose).toHaveBeenCalled()
+
+      it "calls #_directClose when the 'TAB' key is pressed", ->
+        event.keyCode = 9
+        c._onDisplayKeyDown(event)
+        expect(c._directClose).toHaveBeenCalled()
+
+      it "calls #_directClose when the 'ESCAPE' key is pressed", ->
+        event.keyCode = 27
+        c._onDisplayKeyDown(event)
+        expect(c._directClose).toHaveBeenCalled()
+
+      it "blurs the displayElement when the 'ENTER' key is pressed", ->
+        event.keyCode = 13
+        c._onDisplayKeyDown(event)
+        expect(c.current.activePicker.$displayElement.blur).toHaveBeenCalled()
+
+      it "blurs the displayElement when the 'ESCAPE' key is pressed", ->
+        event.keyCode = 27
+        c._onDisplayKeyDown(event)
+        expect(c.current.activePicker.$displayElement.blur).toHaveBeenCalled()
+
+      it "does not blur the displayElement when the 'TAB' key is pressed
+          because that screws with the picker display", ->
+        event.keyCode = 9
+        c._onDisplayKeyDown(event)
+        expect(c.current.activePicker.$displayElement.blur).not.toHaveBeenCalled()

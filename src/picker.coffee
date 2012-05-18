@@ -86,6 +86,7 @@ class chronos.Picker
     # to animate the datepicker
     @_initializeAnimator()
     @_setStartingDate()
+    @_setPickedDate()
     @_setInitialMode()
 
   _initializeContainer: ->
@@ -119,7 +120,6 @@ class chronos.Picker
   # sets the picker's working date
   _setStartingDate: ->
     if @current.options.maxDate != null || @current.options.minDate != null
-
       # if today is past the max date, then set the working date to the max
       if @current.options.maxDate && (@todayDate.valueOf() > @current.options.maxDate.valueOf())
         @startingDate = new Date(@current.options.maxDate.valueOf())
@@ -131,7 +131,14 @@ class chronos.Picker
     # set the working date to today (but a separate object) if still undefined
     if @startingDate == undefined
       @startingDate = new Date(@todayDate.valueOf())
+
     @startingDate
+
+  # set's the pickers picked date if need be
+  _setPickedDate: ->
+    unless @current.options.startBlank
+      if @pickedDateTime == undefined || @pickedDateTime == null
+        @pickedDateTime = new Date(@startingDate.valueOf())
 
   # returns container div for picker
   _createContainer: ->
@@ -200,7 +207,7 @@ class chronos.Picker
       startDay: @current.options.startDay
       dayNamesAbbr: @current.options.dayNamesAbbr
       monthNames: @current.options.monthNames
-      choice: @pickedDateTime  # TODO
+      choice: @pickedDateTime
       maxDate: undefined # TODO
       minDate: undefined # TODO
     )

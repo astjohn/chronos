@@ -28,7 +28,7 @@ class chronos.Chronos
     pmUpper: 'PM'
     pmAbbrLower: 'p'
     pmAbbrUpper: 'P'
-    startBlank: false
+    startBlank: false # allow the datepicker to start empty / blank
     displayFormat: 'isoDate' # format to display after making selection through picker
     typedInputFormat: 'isoDate' # format to allow user to manually type in value
     valueFormat: 'U' # format to post to the server
@@ -176,12 +176,18 @@ class chronos.Chronos
       $target.parents('.chronos_picker')
 
   # Returns true if given picker is valid and not the active Picker
-  _notActivePicker: ($picker) ->
+  _notActivePicker: ($picker, event) ->
     $picker.length > 0 && $picker[0] != @current.activePicker.$container[0]
 
   # Return true if given picker is invalid and we have an active picker
   _noPickerButActive: ($picker) ->
     $picker.length <= 0 && (@current.activePicker != null && @current.activePicker != undefined)
+
+  _notActiveDisplay: (event) ->
+    if @current.activePicker
+      @current.activePicker.$displayElement[0] != event.target
+    else
+      true
 
   # Close datepicker if clicked anywhere in document except current picker or
   # current displayElement
@@ -191,8 +197,10 @@ class chronos.Chronos
 
       # Close picker if we're clicking on a different picker somehow
       # or if we're clicking elsewhere and there's an active picker
-      # Do not close if we're clicking on the currently active picker
-      @_directClose() if @_notActivePicker($picker) || @_noPickerButActive($picker)
+      # Do not close if we're clicking on the currently active picker or displayElement
+      if @_notActiveDisplay(event) && (@_notActivePicker($picker, event) ||
+      @_noPickerButActive($picker))
+        @_directClose()
 
   # returns true if given element is associated with the activePicker
   _isCurrentPicker: (target) ->
@@ -225,17 +233,20 @@ class chronos.Chronos
   # the date picker or for accessibility control features
   _onDisplayKeyUp: (event) ->
     # TODO: Accessibility
-    @current.activePicker.checkAndSetDate()
+    if @current.activePicker
+      @current.activePicker.checkAndSetDate()
 
 
   # handle keydown on displayElement
   _onDisplayKeyDown: (event) ->
-    # close on ENTER or TAB key
-    if event.keyCode == 13
+    # blur if ENTER OR ESC
+    if event.keyCode == 13 || event.keyCode == 27
+      @current.activePicker.$displayElement.blur()
+    # close on ENTER, TAB, or ESC key
+    if event.keyCode == 13 || event.keyCode == 9 || event.keyCode == 27
       @_directClose()
-      $(@current.displayElement).blur()
 
-    console.log event
+
 
 
 

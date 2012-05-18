@@ -247,6 +247,7 @@ describe "Picker", ->
         spyOn(p, '_initializeContainer')
         spyOn(p, '_initializeAnimator')
         spyOn(p, '_setStartingDate')
+        spyOn(p, '_setPickedDate')
         spyOn(p, '_setInitialMode')
 
       it "should call #_initializeContainer", ->
@@ -260,6 +261,10 @@ describe "Picker", ->
       it "should call #_setStartingDate", ->
         p.constructor(current)
         expect(p._setStartingDate).toHaveBeenCalled()
+
+      it "should call #_setPickedDate", ->
+        p.constructor(current)
+        expect(p._setPickedDate).toHaveBeenCalled()
 
       it "should call #_setInitialMode", ->
         p.constructor(current)
@@ -407,7 +412,35 @@ describe "Picker", ->
           expect(p.startingDate.valueOf()).toEqual(min.valueOf())
 
 
+    describe "#_setPickedDate", ->
+      describe "when allowed to start blank", ->
+        it "does not set the pickedDateTime", ->
+          p.pickedDateTime = null
+          p.current.options.startBlank = true
+          p._setPickedDate()
+          expect(p.pickedDateTime).toEqual(null)
 
+      describe "when not allowed to start blank", ->
+        it "does not mess around if a pickedDateTime already exists", ->
+          d = Date.parse("2011-04-22")
+          p.pickedDateTime = d
+          p.current.options.startBlank = false
+          p.startingDate = Date.parse("2011-04-30")
+          p._setPickedDate()
+          expect(p.pickedDateTime.valueOf()).toEqual(d.valueOf())
+
+        it "sets the pickedDateTime to the startingDate if undefined", ->
+          d = Date.parse("2011-04-22")
+          p.pickedDateTime = undefined
+          p.current.options.startBlank = false
+          p.startingDate = d
+          p._setPickedDate()
+          expect(p.pickedDateTime.valueOf()).toEqual(d.valueOf())
+
+  #     # set's the pickers picked date if need be
+  # _setPickedDate: ->
+  #   unless @current.options.startBlank
+  #     @pickedDateTime = new Date(@startingDate.valueOf()) unless @pickedDateTime
 
 
     describe "#_renderYears", ->
@@ -418,16 +451,13 @@ describe "Picker", ->
 
 
 
-
-
-
-
     describe "#_renderMonths", ->
       d = {}
       $container = {}
 
       describe "when no pickedDateTime", ->
         beforeEach ->
+          p.pickedDateTime = undefined
           p.startingDate = new Date("2012-05-10 00:00:00")
 
         it "should build the current month", ->
