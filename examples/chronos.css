@@ -98,6 +98,15 @@
       color: white; }
     .chronos_picker .monthBody .day.otherMonth {
       color: #e1dbff; }
+    .chronos_picker .monthBody .day.unavailable {
+      cursor: auto;
+      background-color: #999999;
+      -webkit-background-size: 20px 20px;
+      -moz-background-size: 20px 20px;
+      background-size: 20px 20px;
+      -webkit-border-radius: 0px;
+      -moz-border-radius: 0px;
+      border-radius: 0px; }
   .chronos_picker .monthHeader {
     font-weight: bold; }
   .chronos_picker .day {

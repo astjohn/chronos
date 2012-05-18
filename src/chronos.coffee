@@ -33,11 +33,11 @@ class chronos.Chronos
     typedInputFormat: 'isoDate' # format to allow user to manually type in value
     valueFormat: 'U' # format to post to the server
     yearsPerPage: 20
-    maxDate: null
-    minDate: null
+    maxDate: undefined
+    minDate: undefined
     startDay: 0  # Sunday (0) through Saturday (6) - be aware that this may affect your
                  # layout, since the days on the right might have a different margin
-    pickedDateTime: null # start datepicker at a specific date
+    pickedDateTime: undefined # start datepicker at a specific date
     useTimePicker: false # set to true to be able to set time with date
     timePickerOnly: false # only use a time picker
     yearOnly: false # only use yearly selection
@@ -65,6 +65,11 @@ class chronos.Chronos
     @_expirePicker()
     @current = $.data(element, chronos.Chronos.PROP_NAME)
 
+  # limit picker's date range
+  # accepts a range object in the form:
+  #   range:
+  #     minDate: Date()
+  #     maxDate: Date()
   setDateRange: (range) ->
     #console.log "WORKS"
 

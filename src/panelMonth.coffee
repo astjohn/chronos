@@ -4,8 +4,8 @@ class chronos.PanelMonth
     #do not mutate original dates
     @givenDate = new Date(options.givenDate.valueOf()) if options.givenDate
     @choice = new Date(options.choice) if options.choice
-    @maxDate = new Date(options.maxDate) if options.maxDate
-    @minDate = new Date(options.minDate) if options.minDate
+    @maxDate = new Date(options.maxDate.valueOf()) if options.maxDate
+    @minDate = new Date(options.minDate.valueOf()) if options.minDate
     @startDay = options.startDay
     @dayNamesAbbr = options.dayNamesAbbr
     @monthNames = options.monthNames

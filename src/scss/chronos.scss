@@ -123,6 +123,14 @@ $colorOtherMonth: #E1DBFF;
       &.otherMonth {
         color: $colorOtherMonth;
       }
+      &.unavailable {
+        cursor: auto;
+        background-color: darken($colorWhite, 40%);
+        -webkit-background-size: 20px 20px;
+        -moz-background-size: 20px 20px;
+        background-size: 20px 20px;
+        @include border-radius(0px);
+      }
     }
   }
   .monthHeader {

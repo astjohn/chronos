@@ -26,35 +26,19 @@
 </section>
 
 <section>
-  <h2>Without Time Picker</h2>
-  <code>$('#no_time_picker').chronos({timePicker: false});</code>
-  <input id="no_time_picker" name="no_time_picker" type="text" />
+  <h2>With Time Picker</h2>
+  <code>$('#with_time_picker').chronos({useTimePicker: true});</code>
+  <input id="with_time_picker" name="with_time_picker" type="text" />
 </section>
 
 <section>
   <h2>With Maximum and Minimum Dates Set</h2>
   <p>Note the code below uses a Date object only to keep with the present date.</p>
-  <code>var d = new Date(),
-  mind = new Date(),
-  maxd = new Date(),
-  maxStr, minStr;
-  maxd.setDate(d.getDate()+7);
-  mind.setDate(d.getDate()-7);
-  maxStr = maxd.getDate() + "-" + maxd.getMonth() + "-" + maxd.getFullYear(),
-  minStr = mind.getDate() + "-" + mind.getMonth() + "-" + mind.getFullYear();
-  $('#w_date_range').chronos({ timePicker: true,
-    format: 'j F Y @ h:iA',
-    degbug: true,
-    inputOutputFormat: 'd-m-Y H:i:s',
-    maxDate: {
-      date: maxStr,
-      format: 'd-m-yyyy'
-    },
-    minDate: {
-      date: minStr,
-      format: 'd-m-yyyy'
-    }
-  });
+  <code>var mind = new Date(),
+  maxd = new Date();
+  maxd.setDate(maxd.getDate()+7);
+  mind.setDate(mind.getDate()-7);
+  $('#w_date_range').chronos({ minDate: mind, madDate: maxd });
   </code>
   <input id="w_date_range" type="text" />
 </section>
@@ -83,43 +67,15 @@
     //   alert("CLOSE FROM VALUE ELEMENT");
     // });
 
+    // With Time Picker
+    //$('#w_time_picker').chronos({timePicker: true});
 
-    // No Time Picker
-    $('#no_time_picker').chronos({timePicker: false});
-    // $('#basic').bind('previousMonthFinished', function(event) {
-    //   event.stopPropagation()
-    //   alert("PREV");
-    // });
-    // $('#basic').bind('daySelect', function(event, one, two, three, four, five, six) {
-    //   console.log("DAY SELECT", event, arguments);
-    //   console.log(one, two, three, four, five, six);
-    // });
-    // $('body').bind('previousMonthFinished', function(event) {
-    //   alert("BODY PREV!!!!!!");
-    // });
+    var mind = new Date(),
+    maxd = new Date();
+    maxd.setDate(maxd.getDate()+7);
+    mind.setDate(mind.getDate()-7);
+    $('#w_date_range').chronos({ minDate: mind, maxDate: maxd });
 
-    // // Date Range
-    // var d = new Date(),
-    //     mind = new Date(),
-    //     maxd = new Date(),
-    //     maxStr, minStr;
-    // maxd.setDate(d.getDate()+7);
-    // mind.setDate(d.getDate()-7);
-    // maxStr = maxd.getDate() + "-" + maxd.getMonth() + "-" + maxd.getFullYear(),
-    // minStr = mind.getDate() + "-" + mind.getMonth() + "-" + mind.getFullYear();
-    // $('#w_date_range').chronos({ timePicker: true,
-    //   debug: true,
-    //   format: 'j F Y @ h:iA',
-    //   inputOutputFormat: 'd-m-Y H:i:s',
-    //   maxDate: {
-    //     date: maxStr,
-    //     format: 'd-m-yyyy'
-    //   },
-    //   minDate: {
-    //     date: minStr,
-    //     format: 'd-m-yyyy'
-    //   }
-    // });
 
     // $('.time_picker_callbacks').chronos({ timePicker: true,
     //   format: 'j F Y @ h:iA',

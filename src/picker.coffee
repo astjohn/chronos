@@ -146,7 +146,6 @@ class chronos.Picker
     klass += " #{@current.options.pickerClass}" if @current.options.pickerClass
     $("<div class='#{klass}' />")
 
-
   # returns the header div for picker, which includes the title, and action buttons
   _createHeader: ->
 
@@ -208,8 +207,8 @@ class chronos.Picker
       dayNamesAbbr: @current.options.dayNamesAbbr
       monthNames: @current.options.monthNames
       choice: @pickedDateTime
-      maxDate: undefined # TODO
-      minDate: undefined # TODO
+      maxDate: @current.options.maxDate
+      minDate: @current.options.minDate
     )
     month = monthPanel.render()
     # handle day selection
