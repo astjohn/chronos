@@ -38,6 +38,21 @@
 </section>
 
 <section>
+  <h2>Accessing Methods</h2>
+  <p>Methods on Chronos can be accessed directly through the object or through
+    the jQuery/Zepto selectors.</p>
+  <code>var direct = $("#w_methods").chronos(),
+  mind = new Date(),
+  maxd = new Date();
+  maxd.setDate(maxd.getDate()+7);
+  mind.setDate(mind.getDate()-7);
+  direct.setDateRange({minDate: mind}); // direct access
+  $("#w_methods").chronos("setDateRange", {maxDate: maxd}); // indirect access
+  </code>
+  <input id="w_methods" type="text" />
+</section>
+
+<section>
   <h2>With 'daySelected' Callback</h2>
   <p>Each picker uses callbacks to restrict the range of the sibling picker.</p>
   <code>$('.date_picker_callbacks').chronos().on('daySelected',
@@ -104,6 +119,10 @@
         $("#date_picker_callback1").chronos('setDateRange', {maxDate: date})
       }
     });
+
+    var direct = $("#w_methods").chronos();
+    direct.setDateRange({minDate: mind}); // direct access
+    $("#w_methods").chronos("setDateRange", {maxDate: maxd}); // indirect access
 
 
   </script>

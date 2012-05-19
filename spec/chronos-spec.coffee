@@ -59,13 +59,21 @@ describe "Chronos", ->
             minDate: "min"
           spyOn(c, '_saveCurrentSettings')
 
-        it "sets the minDate", ->
+        it "sets the minDate if there is one", ->
           c.setDateRange(range)
           expect(c.current.options.minDate).toEqual("min")
 
-        it "sets the maxDate", ->
+        it "sets the maxDate if there is one", ->
           c.setDateRange(range)
           expect(c.current.options.maxDate).toEqual("max")
+
+        it "does not set the minDate if there isn't one", ->
+          c.setDateRange({maxDate: "something"})
+          expect(c.current.options.minDate).toEqual(undefined)
+
+        it "does not set the maxDate if there isn't one", ->
+          c.setDateRange({minDate: "something"})
+          expect(c.current.options.maxDate).toEqual(undefined)
 
         it "saves the current settings", ->
           c.setDateRange(range)

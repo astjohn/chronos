@@ -56,7 +56,7 @@
     ###
 
     _pluginSetCurrentElement = ->
-      $display = $("##{element.attr('id')}_display")
+      $display = $("##{@.attr('id')}_display")
       $.chronos.setCurrentElement($display[0]) if $display.length > 0
 
 
