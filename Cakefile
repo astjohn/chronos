@@ -149,7 +149,7 @@ task 'minify', 'Minifies a compiled js file using Uglifier', (options) ->
 
   if path.existsSync(fullSource)
     console.log "Minifying with Uglifier".yellow
-    exec "node_modules/uglify-js/bin/uglifyjs --output #{fullOutput} #{fullSource}", (err, stdout, stderr) ->
+    exec "node_modules/uglify-js/bin/uglifyjs -nc --output #{fullOutput} #{fullSource}", (err, stdout, stderr) ->
       if err
         console.error "Error encountered during minification".red
         console.error stderr
