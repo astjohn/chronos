@@ -10,3 +10,14 @@ code {
   white-space: pre;
   width: 550px;
 }
+code.inline {
+  border: none;
+  color:#333344;
+  font-size: 1.2em;
+  padding: 0px;
+  margin: 0px 5px;
+  width: inherit;
+  vertical-align: bottom;
+  position: relative;
+  display: inline-block;
+}

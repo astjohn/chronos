@@ -3,18 +3,11 @@
 <head>
 	<title>DP Examples</title>
 	<link rel="stylesheet" type="text/css" href="example_style.css">
-  <link rel="stylesheet" type="text/css" href="chronos.css">
 	<script type="text/javascript" src="../lib/jquery-1.7.2.js"></script>
 
   <!-- Source -->
-	<link rel="stylesheet" type="text/css" href="../src/style.css">
-  <script type="text/javascript" src="../tmp/src/namespace.js"></script>
-  <script type="text/javascript" src="../tmp/src/chronos.js"></script>
-  <script type="text/javascript" src="../tmp/src/picker.js"></script>
-  <script type="text/javascript" src="../tmp/src/dateFormatter.js"></script>
-  <script type="text/javascript" src="../tmp/src/panelMonth.js"></script>
-  <script type="text/javascript" src="../tmp/src/animator.js"></script>
-  <script type="text/javascript" src="../tmp/src/plugin.js"></script>
+	<link rel="stylesheet" type="text/css" href="../build/chronos-0.1.css">
+  <script type="text/javascript" src="../build/chronos-0.1-min.js"></script>
 
 </head>
 <body>
@@ -40,7 +33,9 @@
 <section>
   <h2>Accessing Methods</h2>
   <p>Methods on Chronos can be accessed directly through the object or through
-    the jQuery/Zepto selectors.</p>
+    the jQuery/Zepto selectors. Notice in this example that the date ranges have been
+    set through the <code class="inline">setDateRange</code> method and not during plugin
+    initialization.</p>
   <code>var direct = $("#w_methods").chronos(),
   mind = new Date(),
   maxd = new Date();

@@ -9,6 +9,7 @@
     "coffeelint": "*",
     "colors": "*",
     "wrench": "*",
-    "scss": "*"
+    "scss": "*",
+    "uglify-js": "*"
   }
 }

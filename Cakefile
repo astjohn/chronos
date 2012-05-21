@@ -1,6 +1,7 @@
 fs     = require 'fs'
 path   = require 'path'
 {exec} = require 'child_process'
+uglify = require "uglify-js"
 
 # Make sure we have our dependencies
 try
@@ -26,6 +27,17 @@ paths.srcScss = path.join paths.src, 'scss'
 for dir in [paths.build, paths.tmp]
   fs.mkdirSync dir, '0755' if not path.existsSync dir
 
+## = APP FILES = ##
+appFiles  = [
+  # omit src/ and .coffee to make the below lines a little shorter
+  'namespace'
+  'chronos'
+  'picker'
+  'dateFormatter'
+  'panelMonth'
+  'animator'
+  'plugin'
+]
 
 # paths =
 #   tmpDir: 'tmp'
@@ -93,53 +105,65 @@ coffeeLintConfig =
     value: 'unix'
     level: 'warn'
 
-# task 'build', 'Compiles and minifies JavaScript file for production use', ->
-#   console.log "Compiling CoffeeScript".yellow
-#   # Compile test scripts for consistency
-#   exec "coffee --compile --bare --output #{paths.testLibDir} #{paths.testDir}"
-#   exec "coffee --compile --bare --output #{paths.libDir} #{paths.srcDir}", (e, o, se) ->
-#     if e
-#       console.error "Error encountered while compiling CoffeeScript".red
-#       console.error se
-#       process.exit 1
+option '-v', '--version [VERSION]', 'set the version for task:build or task:minify'
+task 'build', 'Compiles JavaScript file for production use', (options) ->
+  version = options.version ||= "full"
+  outputFilename = "chronos-#{version}"
+  fullSource = path.join(paths.tmpSrc, "#{outputFilename}.coffee")
 
-#     console.log "CoffeeScript Compiled".green
+  console.log "Combining CoffeeScript".yellow
+  appContents = new Array remaining = appFiles.length
+  for file, index in appFiles then do (file, index) ->
+    fs.readFile path.join(paths.src, "#{file}.coffee"), 'utf8', (err, fileContents) ->
+      if err
+        console.error "Error encountered while reading file: #{file.coffee}".red
+        console.error err
+        process.exit 1
+      appContents[index] = fileContents
+      process() if --remaining is 0
+  process = ->
+    fs.writeFile fullSource, appContents.join('\n\n'), 'utf8', (err) ->
+      if err
+        console.error "Error encountered while writing file: 'chronos-full.coffee'".red
+        console.error err
+        process.exit 1
+      exec "coffee --compile --bare --output #{paths.build} #{fullSource}", (e, o, se) ->
+        if e
+          console.error "Error encountered while compiling CoffeeScript".red
+          console.error se
+          process.exit 1
+        fs.unlink path.join(paths.tmpSrc, "chronos-full.coffee"), (err) ->
+          if e
+            console.error "Unable to unlink chronos-full.coffee".red
+            console.error se
+            process.exit 1
+          else
+            console.log "CoffeeScript Compiled".green
 
-#     # Compile
-#     console.log "Compiling with Closure Compiler".yellow
-#     # Add custom externs to compiler flags
-#     if path.existsSync paths.externsDir
-#       (fs.readdirSync paths.externsDir).forEach (f) ->
-#         closureCompilerFlags.push("--compiler_flags=\"--externs=#{path.join paths.externsDir, f}\"")
+task 'minify', 'Minifies a compiled js file using Uglifier', (options) ->
+  version = options.version ||= "full"
+  sourceFilename = "chronos-#{version}"
+  fullSource = path.join(paths.build, "#{sourceFilename}.js")
+  outputFilename = "#{sourceFilename}-min"
+  fullOutput = path.join(paths.build, "#{outputFilename}.js")
 
-#     outputPath = path.join paths.buildDir, "#{packageInfo.name}-#{packageInfo.version}.js"
-#     p = exec "#{paths.closureBuilder}
-#             --root #{paths.libDir} --input #{path.join paths.libDir, 'main.js'}
-#             --output_mode=compiled
-#             --compiler_jar=#{path.join paths.closureDir, 'compiler/compiler.jar'}
-#             #{closureCompilerFlags.join ' '} --output_file=#{outputPath}"
-#     p.stderr.on 'data', stdErrorStreamer (line) ->
-#       str = line
-#       # Strip out command name from messages
-#       if line.substr(0, paths.closureBuilder.length) is paths.closureBuilder
-#         str = line.substr(paths.closureBuilder.length + 2)
+  if path.existsSync(fullSource)
+    console.log "Minifying with Uglifier".yellow
+    exec "node_modules/uglify-js/bin/uglifyjs --output #{fullOutput} #{fullSource}", (err, stdout, stderr) ->
+      if err
+        console.error "Error encountered during minification".red
+        console.error stderr
+        process.exit 1
+      else
+        console.log "Javascript Minified".green
+  else
+    console.error "Could not find #{fullSource}. Did you run the 'build' task yet?".red
+    process.exit 1
 
-#       if /ERROR/.test str
-#         str = str.red
-#       else if /WARNING/.test str
-#         str = str.yellow
-#       else
-#         str = str.grey
 
-#       str
 
-#     p.on 'exit', (code) ->
-#       if code
-#         console.error "Error encountered while compiling".red
-#         process.exit 1
 
-#       console.log "Compiled and minified: " + outputPath.green
-#       invoke 'size'
+
 
 task 'watch', 'Automatically recompile CoffeeScript files to JavaScript', ->
   console.log "Watching coffee files for changes, press Control-C to quit".yellow
@@ -187,124 +211,8 @@ task 'watch', 'Automatically recompile CoffeeScript files to JavaScript', ->
 #       else
 #         console.log "#{pass}  #{shortPath}".green
 
-# # Helper for finding all source files
-# getSourceFilePaths = (dirPath = paths.srcDir) ->
-#   files = []
-#   for file in fs.readdirSync dirPath
-#     filepath = path.join dirPath, file
-#     stats = fs.lstatSync filepath
-#     if stats.isDirectory()
-#       files = files.concat getSourceFilePaths filepath
-#     else if /\.coffee$/.test file
-#       files.push filepath
-#   files
-
-# task 'server', 'Start a web server in the root directory', ->
-#   console.log "Starting web server at http://localhost:8000"
-#   proc = exec "python -m SimpleHTTPServer"
-#   proc.stderr.on 'data', stdOutStreamer (data) -> data.grey
-#   proc.stdout.on 'data', stdOutStreamer (data) -> data.grey
-
-# task 'test:phantom', 'Run tests via phantomJS', ->
-#   exec "which phantomjs", (e, o, se) ->
-#     if e
-#       console.error "Must install PhantomJS http://phantomjs.org/".red
-#       process.exit -1
-
-#   # Disable web security so we don't have to run a server on localhost for AJAX
-#   # calls
-#   console.log "Running unit tests via PhantomJS".yellow
-#   p = exec "phantomjs #{paths.testLibDir}/phantom-driver.coffee --web-security=no"
-#   p.stderr.on 'data', stdErrorStreamer (data) -> data.red
-#   # The phantom driver outputs JSON
-#   bufferedOutput = ''
-#   p.stdout.on 'data', (data) ->
-#     bufferedOutput += data
-#     return unless bufferedOutput[bufferedOutput.length - 1] is "\n"
-
-#     unless /^PHANTOM/.test bufferedOutput
-#       process.stdout.write data.grey
-
-#     pass = "✔".green
-#     fail = "✖".red
-
-#     # Split lines
-#     for line in (bufferedOutput.split '\n')
-#       continue unless line
-#       try
-#         obj = JSON.parse(line.substr 9)
-#         switch obj.name
-#           when 'error'
-#             console.error "{#fail}  JavaScript Error: #{obj.result.error}".red
-
-#           when 'log'
-#             continue if obj.result.result
-#             if 'expected' of obj.result
-#               console.error "#{fail}  Failure: #{obj.result.message}; Expected: #{obj.result.expected}, Actual: #{obj.result.actual}"
-#             else
-#               console.error "#{fail}  Failure: #{obj.result.message}"
-
-#           when 'moduleDone'
-#             if obj.result.failed
-#               console.error "#{fail}  #{obj.result.name} module: #{obj.result.passed} tests passed, " + "#{obj.result.failed} tests failed".red
-#             else
-#               console.log "#{pass}  #{obj.result.name} module: #{obj.result.total} tests passed"
-
-#           # Output statistics on completion
-#           when 'done'
-#             console.log "\nFinished in #{obj.result.runtime/1000}s".grey
-#             if obj.result.failed
-#               console.error "#{fail}  #{obj.result.passed} tests passed, #{obj.result.failed} tests failed (#{Math.round(obj.result.passed / obj.result.total * 100)}%)"
-#               process.exit -1
-#             else
-#               console.log "#{pass}  #{obj.result.total} tests passed"
-#       catch ex
-#         console.error "JSON parsing fail: #{line}".red
-
-#     bufferedOutput = ''
-
-#   p.on 'exit', (code) ->
-#     process.exit code
 
 
-# task 'clean', 'Remove temporary and generated files', ->
-#   # Delete generated deps.js file
-#   if path.existsSync paths.depsJs
-#     fs.unlinkSync paths.depsJs
-#     console.log "Deleted #{paths.depsJs}".magenta
-
-#   for file in fs.readdirSync paths.libDir
-#     filepath = path.join paths.libDir, file
-#     # Skip special directories
-#     continue if filepath in [paths.externsDir, paths.closureDir]
-#     stats = fs.lstatSync filepath
-#     if stats.isDirectory()
-#       wrench.rmdirSyncRecursive filepath
-#       console.log "Removed #{filepath}".magenta
-#     else if /\.js$/.test filepath
-#       fs.unlinkSync filepath
-#       console.log "Removed #{filepath}".magenta
-
-#   # Remove generated test jS
-#   for file in fs.readdirSync paths.testLibDir
-#     continue unless /\.js$/.test file
-#     filepath = path.join paths.testLibDir, file
-#     fs.unlinkSync filepath
-#     console.log "Removed #{filepath}".magenta
-
-#   # Remove build/ and tmp/
-#   for dir in [paths.tmpDir, paths.buildDir]
-#     continue if not path.existsSync dir
-#     wrench.rmdirSyncRecursive dir
-#     console.log "Removed #{dir}".magenta
-
-# task 'size', 'Report file size', ->
-#   return if not path.existsSync paths.buildDir
-#   for file in fs.readdirSync paths.buildDir
-#     # Skip non-JS files
-#     if /\.js$/.test file
-#       stats = fs.statSync path.join paths.buildDir, file
-#       console.log "#{file}: #{stats.size} bytes"
 
 # Helper for stripping trailing endline when outputting
 stripEndline = (str) ->
@@ -317,28 +225,10 @@ insertJsError = (filepath, js) ->
   fs.writeSync jsFile, """console.error(unescape("#{escape js}"))""" + "\n"
   fs.closeSync jsFile
 
-# # Helper for updating deps.js file after changes
-# updateDeps = ->
-#   # Write file out to same directory as base.js to take advantage of default
-#   # path
-#   exec "#{paths.calcdeps} -p #{paths.libDir} -o deps -e #{paths.depsJs}
-#         -e #{paths.externsDir} --output_file=#{paths.depsJs}", (e, o, se) ->
-#     if e
-#       console.error "Error while computing deps.js".red
-#       console.error stripEndline se
-#     else
-#       console.log "Updated #{paths.depsJs}".green
-
-# updateDepsTimeout = false
-# # Delay a little in case of multiple files modified
-# updateDepsDebounced = ->
-#   clearTimeout updateDepsTimeout if updateDepsTimeout
-#   updateDepsTimeout = setTimeout updateDeps, 50
-
-# stdOutStreamer = (filter) ->
-#   (str) ->
-#     str = filter str if filter
-#     process.stderr.write str
+stdOutStreamer = (filter) ->
+  (str) ->
+    str = filter str if filter
+    process.stderr.write str
 
 stdErrorStreamer = (filter) ->
   (str) ->
