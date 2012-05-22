@@ -80,6 +80,31 @@ describe "Chronos", ->
           expect(c._saveCurrentSettings).toHaveBeenCalled()
 
 
+    describe "#setDate", ->
+      it "calls setDate on the picker if there is an active picker", ->
+        c.current =
+          activePicker:
+            setDate: "whatever"
+        spyOn(c.current.activePicker, 'setDate')
+        c.setDate("a date")
+        expect(c.current.activePicker.setDate).toHaveBeenCalledWith("a date")
+
+      describe "when there is not an active picker", ->
+        beforeEach ->
+          c.current =
+            activePicker: undefined
+            options:
+              pickedDateTime: undefined
+          spyOn(c, '_saveCurrentSettings')
+
+        it "sets the pickedDateTime to the given date", ->
+          c.setDate("a date")
+          expect(c.current.options.pickedDateTime).toEqual("a date")
+
+        it "saves the current settings", ->
+          c.setDate("a date")
+          expect(c._saveCurrentSettings).toHaveBeenCalled()
+
   describe "private methods", ->
 
     describe "#_attach", ->

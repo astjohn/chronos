@@ -77,6 +77,14 @@ class chronos.Chronos
       @current.options.maxDate = range.maxDate if range.maxDate
       @_saveCurrentSettings()
 
+  # set the picker's current date
+  # accepts a valid date object
+  setDate: (date) ->
+    if @current.activePicker
+      @current.activePicker.setDate(date)
+    else
+      @current.options.pickedDateTime = date
+      @_saveCurrentSettings()
 
 
   ###

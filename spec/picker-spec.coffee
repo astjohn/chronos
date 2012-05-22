@@ -6,7 +6,7 @@ describe "Picker", ->
     current.options = chronos.Chronos._defaultOptions
     current.valueElement = "<input type='text' id='ve' name='ve[]' style='display: none;' />"
     current.displayElement = "<input type='text' id='ve_display' />"
-    current.pickedDateTime = undefined
+    current.options.pickedDateTime = undefined
     p = new chronos.Picker(current)
 
 
@@ -18,9 +18,9 @@ describe "Picker", ->
       expect(p.todayDate.getDate()).toBeTruthy() # duck type
 
     it "should set @pickedDateTime", ->
-      current.pickedDateTime = new Date()
+      current.options.pickedDateTime = new Date()
       x = new chronos.Picker(current)
-      expect(x.pickedDateTime.getDate()).toBeTruthy() # duck type
+      expect(x.current.options.pickedDateTime.getDate()).toBeTruthy() # duck type
 
     it "should set the @$valueElment", ->
       expect(p.$valueElement.hide()).toBeTruthy() # duck type
