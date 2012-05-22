@@ -11,6 +11,12 @@
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+
+    <link rel="stylesheet" href="stylesheets/chronos-0.1.css">
+
+    <script src="https://github.com/astjohn/chronos/raw/master/lib/jquery-1.7.2.js"></script>
+    <script src="https://github.com/astjohn/chronos/raw/master/build/chronos-0.1-min.js"></script>
+
   </head>
   <body>
     <div class="wrapper">
@@ -19,45 +25,523 @@
         <p>A modern datepicker</p>
         <p class="view"><a href="https://github.com/astjohn/chronos">View the Project on GitHub <small>astjohn/chronos</small></a></p>
         <ul>
-          <li><a href="https://github.com/astjohn/chronos/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/astjohn/chronos/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/astjohn/chronos">View On <strong>GitHub</strong></a></li>
+          <li><a href="https://raw.github.com/astjohn/chronos/master/build/chronos-0.1.js">Download <strong>v0.1</strong></a></li>
+          <li><a href="https://raw.github.com/astjohn/chronos/master/build/chronos-0.1.min.js">Download <strong>v0.1 min</strong></a></li>
+          <li><a href="https://github.com/astjohn/chronos/zipball/master">Download <strong>Source ZIP</strong></a></li>
+        </ul>
+        <ul class="toc">
+          <li><a href="#intro">Introduction</a></li>
+          <li><a href="#how">Under The Hood</a></li>
+          <li><a href="#options">Options</a></li>
+          <li><a href="#date_formats">Date Formats</a></li>
+          <li><a href="#methods">Methods</a></li>
+          <li><a href="#events">Events</a></li>
+          <li><a href="#authors">Authors</a></li>
         </ul>
       </header>
       <section>
-        <h3>Welcome to GitHub Pages.</h3>
+        <h3 id="intro">A Flexible, Easy-To-Use DatePicker</h3>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+<p>Chronos was created to fill the need for an easy-to-use datepicker without having to rely on a picker such as jQueryUI and the associated overhead.  Chronos is designed to be jQuery and Zepto compatible and follows the standard jQuery plugin pattern for interaction.
+</p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
+<input id="basic" type="text" name="basic" />
+<pre><code>$('#basic').chronos();</code></pre>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<h3 id="how">Under The Hood</h3>
+<p>When a chronos picker is initialized, the original input element (the 'value element')
+becomes hidden from the user, and a new element (the 'display' element) is created.
+The display element is a clone of the value element, but without the name attribute so
+that its value is not posted to the server.  It is used for display purposes only. The
+display element's id consists of the id of the value element and "_display". In addition,
+the class 'chronos_picker' will be appended to the value element's classes.  The
+class 'chronos_picker_display' will be appended to the display element.</p>
 
-<h3>Designer Templates</h3>
+<p>Two input elements are used so that the display format of the chosen date is separated
+from the value posted to the server.  When a date is selected, the value element is
+updated to the chosen date according to the format specified by the
+<code>valueFormat</code> option.  The display element's value is updated according to
+the format specified by the <code>displayFormat</code> option.</p>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<h3 id="options">Options</h3>
+<p>Chronos pickers may be adjusted on initialization by passing an options object.</p>
 
-<h3>Rather Drive Stick?</h3>
+<table>
+  <tr>
+    <th>Option</th>
+    <th>Type</th>
+    <th>Default Value</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>pickerClass</td>
+    <td>String</td>
+    <td>blank</td>
+    <td>Optional string of classes to add to the display element.</td>
+  </tr>
+  <tr>
+    <td>dayNames</td>
+    <td>String Array</td>
+    <td>[ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sunday", "Monday", "Tuesday",
+    "Wednesday", "Thursday", "Friday", "Saturday" ]</td>
+    <td>Days of the week.</td>
+  </tr>
+  <tr>
+    <td>dayNamesAbbr</td>
+    <td>String Array</td>
+    <td>[ "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]</td>
+    <td>Abbreviated days of the week.</td>
+  </tr>
+  <tr>
+    <td>monthNames</td>
+    <td>String Array</td>
+    <td>[ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
+    "Nov", "Dec", "January", "February", "March", "April", "May", "June", "July",
+    "August", "September", "October", "November", "December" ]</td>
+    <td>Months of the year.</td>
+  </tr>
+  <tr>
+    <td>amLower</td>
+    <td>String</td>
+    <td>"am"</td>
+    <td>Lowercase ante meridiem abbreviation.</td>
+  </tr>
+  <tr>
+    <td>amUpper</td>
+    <td>String</td>
+    <td>"AM"</td>
+    <td>Uppercase ante meridiem abbreviation.</td>
+  </tr>
+  <tr>
+    <td>amAbbrLower</td>
+    <td>String</td>
+    <td>"a"</td>
+    <td>Single character, lowercase ante meridiem abbreviation.</td>
+  </tr>
+  <tr>
+    <td>amAbbrUpper</td>
+    <td>String</td>
+    <td>"A"</td>
+    <td>Single character, uppercase ante meridiem abbreviation.</td>
+  </tr>
+  <tr>
+    <td>pmLower</td>
+    <td>String</td>
+    <td>"pm"</td>
+    <td>Lowercase post meridiem abbreviation.</td>
+  </tr>
+  <tr>
+    <td>pmUpper</td>
+    <td>String</td>
+    <td>"PM"</td>
+    <td>Uppercase post meridiem abbreviation.</td>
+  </tr>
+  <tr>
+    <td>pmAbbrLower</td>
+    <td>String</td>
+    <td>"p"</td>
+    <td>Single character, lowercase post meridiem abbreviation.</td>
+  </tr>
+  <tr>
+    <td>pmAbbrUpper</td>
+    <td>String</td>
+    <td>"P"</td>
+    <td>Single character, uppercase post meridiem abbreviation.</td>
+  </tr>
+  <tr>
+    <td>startBlank</td>
+    <td>Boolean</td>
+    <td>false</td>
+    <td>When true, the datepicker will start with a blank value, otherwise it will
+    start with the current date or <code>pickedDateTime</code>.</td>
+  </tr>
+  <tr>
+    <td>displayFormat</td>
+    <td>String</td>
+    <td>"isoDate"</td>
+    <td>Format to display after making a selection in the picker.</td>
+  </tr>
+  <tr>
+    <td>valueFormat</td>
+    <td>String</td>
+    <td>"U"</td>
+    <td>Format of value posted to server.</td>
+  </tr>
+  <tr>
+    <td>maxDate</td>
+    <td>Date</td>
+    <td>undefined</td>
+    <td>Maximum allowed date (inclusive). Must be a valid Date object.</td>
+  </tr>
+  <tr>
+    <td>minDate</td>
+    <td>Date</td>
+    <td>undefined</td>
+    <td>Minimum allowed date (inclusive). Must be a valid Date object.</td>
+  </tr>
+  <tr>
+    <td>startDay</td>
+    <td>Integer</td>
+    <td>0</td>
+    <td>Sunday (0) through Saturday (6) - be aware that this may affect your layout,
+    since the days on the right might have a different margin.</td>
+  </tr>
+  <tr>
+    <td>pickedDateTime</td>
+    <td>Date</td>
+    <td>undefined</td>
+    <td>Start datepicker at a specific date. Must be a valid Date object.</td>
+  </tr>
+  <tr>
+    <td>animations</td>
+    <td>Object</td>
+    <td>
+      {previousMonth: undefined, nextMonth: undefined, close: undefined, open: undefined}
+    </td>
+    <td>Animations to use during the datepicker's operation.
+    Object must consist of the given keys where the values are valid Functions. Default
+    animations are performed when not defined by the user.
+    </td>
+  </tr>
+  <tr>
+    <td>positionOffset</td>
+    <td>Object</td>
+    <td>{top: 0, left: 0}</td>
+    <td>Offset to adjust position of picker. Units should be given as integers
+    representing pixels (i.e. do not provide the unit 'px')</td>
+  </tr>
+  <tr>
+    <td>debug</td>
+    <td>Boolean</td>
+    <td>false</td>
+    <td>Display element is not hidden when set to 'true'.</td>
+  </tr>
+</table>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<p>Note that <code>dayNames</code> and <code>monthNames</code> must contain abbreviated
+and full representations. In addition, order in the <code>dayNames</code>,
+<code>dayNamesAbbr</code>, <code>monthNames</code> arrays is important for date
+formatting. Use the <code>startDay</code> option to offset the week's starting day for display in calendar.</p>
 
-<h3>Authors and Contributors</h3>
+<h3 id="date_formats">Date Formats</h3>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<p>Date formatting in Chronos is based on Steve Levithan's awesome
+<a href="http://blog.stevenlevithan.com/archives/date-time-format" target="_new">
+  Javascript Date Format
+</a>
+library.  Date objects are formatted according to a user specified mask.  For example,
+<code>"m/dd/yy"</code> would result in <code>"6/09/12"</code>. One of several named masks
+may also be used.  For example, <code>"isoDateTime"</code> would result in
+<code>"20012-06-09T17:33:21"</code>.  These formats can be used for the
+<code>displayFormat</code> and <code>valueFormat</code> options.
 
-<h3>Support or Contact</h3>
+<table>
+  <tr>
+    <th>Mask</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>d</td>
+    <td>Day of the month as digits; no leading zero for single-digit days.</td>
+  </tr>
+  <tr>
+    <td>dd</td>
+    <td>Day of the month as digits; leading zero for single-digit days.</td>
+  </tr>
+  <tr>
+    <td>ddd</td>
+    <td>Day of the week as a three-letter abbreviation.</td>
+  </tr>
+  <tr>
+    <td>dddd</td>
+    <td>Day of the week as its full name.</td>
+  </tr>
+  <tr>
+    <td>m</td>
+    <td>Month as digits; no leading zero for single-digit months.</td>
+  </tr>
+  <tr>
+    <td>mm</td>
+    <td>Month as digits; leading zero for single-digit months.</td>
+  </tr>
+  <tr>
+    <td>mmm</td>
+    <td>Month as a three-letter abbreviation.</td>
+  </tr>
+  <tr>
+    <td>mmmm</td>
+    <td>Month as its full name.</td>
+  </tr>
+  <tr>
+    <td>yy</td>
+    <td>Year as last two digits; leading zero for years less than 10.</td>
+  </tr>
+  <tr>
+    <td>yyyy</td>
+    <td>Year represented by four digits.</td>
+  </tr>
+  <tr>
+    <td>h</td>
+    <td>Hours; no leading zero for single-digit hours (12-hour clock).</td>
+  </tr>
+  <tr>
+    <td>hh</td>
+    <td>Hours; leading zero for single-digit hours (12-hour clock).</td>
+  </tr>
+  <tr>
+    <td>H</td>
+    <td>Hours; no leading zero for single-digit hours (24-hour clock).</td>
+  </tr>
+  <tr>
+    <td>HH</td>
+    <td>Hours; leading zero for single-digit hours (24-hour clock).</td>
+  </tr>
+  <tr>
+    <td>M</td>
+    <td>Minutes; no leading zero for single-digit minutes.<br></td>
+  </tr>
+  <tr>
+    <td>MM</td>
+    <td>Minutes; leading zero for single-digit minutes.<br></td>
+  </tr>
+  <tr>
+    <td>s</td>
+    <td>Seconds; no leading zero for single-digit seconds.</td>
+  </tr>
+  <tr>
+    <td>ss</td>
+    <td>Seconds; leading zero for single-digit seconds.</td>
+  </tr>
+  <tr>
+    <td>U</td>
+    <td>Unix Time: the number of milliseconds since midnight of January 1, 1970</td>
+  </tr>
+  <tr>
+    <td>l <em>or</em> L</td>
+    <td>Milliseconds. <code>l</code> gives 3 digits. <code>L</code> gives 2 digits.</td>
+  </tr>
+  <tr>
+    <td>t</td>
+    <td>Lowercase, single-character time marker string: <em>a</em> or <em>p</em>.<br></td>
+  </tr>
+  <tr>
+    <td>tt</td>
+    <td>Lowercase, two-character time marker string: <em>am</em> or <em>pm</em>.<br></td>
+  </tr>
+  <tr>
+    <td>T</td>
+    <td>Uppercase, single-character time marker string: <em>A</em> or <em>P</em>.<br></td>
+  </tr>
+  <tr>
+    <td>TT</td>
+    <td>Uppercase, two-character time marker string: <em>AM</em> or <em>PM</em>.<br></td>
+  </tr>
+  <tr>
+    <td>Z</td>
+    <td>US timezone abbreviation, e.g. <em>EST</em> or <em>MDT</em>. With non-US timezones or in the Opera browser, the GMT/UTC offset is returned, e.g. <em>GMT-0500</em><br></td>
+  </tr>
+  <tr>
+    <td>o</td>
+    <td>GMT/UTC timezone offset, e.g. <em>-0500</em> or <em>+0230</em>.<br></td>
+  </tr>
+  <tr>
+    <td>S</td>
+    <td>The date's ordinal suffix (<em>st</em>, <em>nd</em>, <em>rd</em>, or <em>th</em>). Works well with <code>d</code>.<br></td>
+  </tr>
+  <tr>
+    <td>'…' <em>or</em> "…"</td>
+    <td>Literal character sequence. Surrounding quotes are removed.<br></td>
+  </tr>
+  <tr>
+    <td>UTC:</td>
+    <td>Must be the first four characters of the mask. Converts the date from local time to UTC/GMT/Zulu time before applying the mask. The "UTC:" prefix is removed.<br></td>
+  </tr>
+</table>
+<p>The following named masks can be used too.</p>
+<table>
+  <tr>
+    <th>Mask</th>
+    <th>Description</th>
+    <th>Example</th>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>ddd mmm dd yyyy HH:MM:ss</td>
+    <td>Sat Jun 09 2007 17:46:21</td>
+  </tr>
+  <tr>
+    <td>shortDate</td>
+    <td>d/m/yy</td>
+    <td>9/6/07</td>
+  </tr>
+  <tr>
+    <td>USshortDate</td>
+    <td>m/d/yy</td>
+    <td>6/9/07</td>
+  </tr>
+  <tr>
+    <td>mediumDate</td>
+    <td>mmm d, yyyy</td>
+    <td>Jun 9, 2007</td>
+  </tr>
+  <tr>
+    <td>longDate</td>
+    <td>mmmm d, yyyy</td>
+    <td>June 9, 2007</td>
+  </tr>
+  <tr>
+    <td>fullDate</td>
+    <td>dddd, mmmm d, yyyy</td>
+    <td>Saturday, June 9, 2007</td>
+  </tr>
+  <tr>
+    <td>shortTime</td>
+    <td>h:MM TT</td>
+    <td>5:46 PM</td>
+  </tr>
+  <tr>
+    <td>mediumTime</td>
+    <td>h:MM:ss TT</td>
+    <td>5:46:21 PM</td>
+  </tr>
+  <tr>
+    <td>longTime</td>
+    <td>h:MM:ss TT Z</td>
+    <td>5:46:21 PM EST</td>
+  </tr>
+  <tr>
+    <td>isoDate</td>
+    <td>yyyy-mm-dd</td>
+    <td>2007-06-09</td>
+  </tr>
+  <tr>
+    <td>isoTime</td>
+    <td>HH:MM:ss</td>
+    <td>17:46:21</td>
+  </tr>
+  <tr>
+    <td>isoDateTime</td>
+    <td>yyyy-mm-dd'T'HH:MM:ss</td>
+    <td>2007-06-09T17:46:21</td>
+  </tr>
+  <tr>
+    <td>isoUtcDateTime</td>
+    <td>UTC:yyyy-mm-dd'T'HH:MM:ss'Z'</td>
+    <td>2007-06-09T22:46:21Z</td>
+  </tr>
+</table>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+<h3 id="methods">Accessing Methods</h3>
+
+<p>Methods on Chronos can be accessed directly through the object or through
+    the jQuery/Zepto selectors. Notice in the following example that the date ranges have been set through the <code>setDateRange</code> method and not during plugin
+    initialization.</p>
+
+<pre><code>var direct = $("#w_methods").chronos(),
+mind = new Date(),
+maxd = new Date();
+maxd.setDate(maxd.getDate()+7);
+mind.setDate(mind.getDate()-7);
+direct.setDateRange({minDate: mind}); // direct access
+$("#w_methods").chronos("setDateRange", {maxDate: maxd}); // indirect access</code></pre>
+<input id="w_methods" type="text" />
+
+<table>
+  <tr>
+    <th>Method</th>
+    <th>Returns</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>setDateRange({range options})</td>
+    <td>this</td>
+    <td>Set the maximum and/or minimum date range. Accepts a range object in the format:
+    {minDate: Date, maxDate: Date}</td>
+  </tr>
+</table>
+
+<h3 id="events">Events</h3>
+
+<p>Chronos has a variety of events that are triggered throughout operation.</p>
+
+<table>
+  <tr>
+    <th>Event</th>
+    <th>Data</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>daySelected</td>
+    <td>(Event, Date Selected, Element Selected)</td>
+    <td>When a calendar day is selected.</td>
+  </tr>
+  <tr>
+    <td>opened</td>
+    <td>(Event)</td>
+    <td>When the datepicker has finished the open animation.</td>
+  </tr>
+  <tr>
+    <td>closed</td>
+    <td>(Event)</td>
+    <td>When the datepicker has finished the close animation.</td>
+  </tr>
+  <tr>
+    <td>previousMonthFinished</td>
+    <td>(Event)</td>
+    <td>When the datepicker has finished the previous month animation.</td>
+  </tr>
+  <tr>
+    <td>nextMonthFinished</td>
+    <td>(Event)</td>
+    <td>When the datepicker has finished the next month animation.</td>
+  </tr>
+  <tr>
+    <td>validDate</td>
+    <td>(Event)</td>
+    <td>When a user has manually typed a date and that date is valid.</td>
+  </tr>
+  <tr>
+    <td>invalidDate</td>
+    <td>(Event)</td>
+    <td>When a user has manually typed a date and that date is not valid.</td>
+  </tr>
+</table>
+
+<h3 id="authors">Authors and Contributors</h3>
+
+<p>Chronos was created by Adam St. John (<a href="https://github.com/astjohn" class="user-mention" target="_new">Github</a>, <a href="http://twitter.com/#!/astjohn" class="user-mention" target="_new">Twitter</a>, <a href="http://www.astjohn.ca/blog" class="user-mention" target="_new">Blog</a>) in 2012. It is loosely based on
+<a href="http://mootools.net/forge/p/mootools_datepicker" target="_new">MooTool's datepicker</a>
+and <a href="https://github.com/zenapsis/will_pickdate" target="_new">will_pickdate</a>.</p>
+
       </section>
       <footer>
-        <p>This project is maintained by <a href="https://github.com/astjohn">astjohn</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+        <p>This project is maintained by <a href="https://github.com/astjohn" target="_new">astjohn</a></p>
+        <p><small>Hosted on GitHub Pages - Theme based on <a href="https://github.com/orderedlist" target="_new">orderedlist</a></small></p>
       </footer>
-    </div>
+
     <script src="javascripts/scale.fix.js"></script>
-    
+    <script type="text/javascript">
+    // Basic
+    var temp = $('#basic').chronos();
+
+    var mind = new Date(),
+    maxd = new Date();
+    maxd.setDate(maxd.getDate()+7);
+    mind.setDate(mind.getDate()-7);
+    var direct = $("#w_methods").chronos();
+    direct.setDateRange({minDate: mind}); // direct access
+    $("#w_methods").chronos("setDateRange", {maxDate: maxd}); // indirect access
+
+
+    $('.date_picker_callbacks').chronos().on('daySelected', function(event, date, element) {
+      $target = $(event.target)
+      if ($target.attr('id') == "date_picker_callback1") {
+        $("#date_picker_callback2").chronos('setDateRange', {minDate: date})
+      } else {
+        $("#date_picker_callback1").chronos('setDateRange', {maxDate: date})
+      }
+    });
+
+  </script>
   </body>
 </html>
