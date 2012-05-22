@@ -39,45 +39,6 @@ appFiles  = [
   'plugin'
 ]
 
-# paths =
-#   tmpDir: 'tmp'
-# for dir in ['build', 'src', 'lib', 'test']
-#   paths["#{dir}Dir"] = dir
-# paths.closureDir = path.join paths.libDir, 'closure'
-# paths.externsDir = path.join paths.libDir, 'externs'
-# paths.calcdeps = path.join paths.closureDir, 'library/bin/calcdeps.py'
-# paths.closureBuilder = path.join paths.closureDir, 'library/bin/build/closurebuilder.py'
-# paths.depsJs = path.join paths.closureDir, 'library/deps.js'
-# paths.testLibDir = paths.testDir + '/lib'
-
-
-
-# # Read in package.json
-# packageInfo = JSON.parse fs.readFileSync path.join __dirname, 'package.json'
-
-# closureCompilerFlags = [
-#   "--compilation_level=ADVANCED_OPTIMIZATIONS"
-#   "--language_in=ECMASCRIPT5_STRICT"
-#   "--output_wrapper='(function(){%output%}).call(window);'"
-#   "--jscomp_error=accessControls"
-#   "--jscomp_error=checkRegExp"
-#   "--jscomp_error=checkVars"
-#   "--jscomp_error=deprecated"
-#   "--jscomp_error=invalidCasts"
-#   "--jscomp_error=missingProperties"
-#   "--jscomp_error=undefinedVars"
-#   "--jscomp_error=visibility"
-#   "--jscomp_warning=fileoverviewTags"
-#   "--jscomp_warning=nonStandardJsDocs"
-#   "--jscomp_warning=strictModuleDepCheck"
-#   "--jscomp_warning=unknownDefines"
-#   "--warning_level=VERBOSE"
-#   "--summary_detail_level=3"
-#   # Add any custom variable definitions below, using same format
-#   "--define='goog.DEBUG=false'"
-#   "--define='myproject.DEBUG=false'"
-# ].map (flag) -> "--compiler_flags=\"#{flag}\""
-
 coffeeLintConfig =
   no_tabs:
     level: 'error'
@@ -144,7 +105,7 @@ task 'minify', 'Minifies a compiled js file using Uglifier', (options) ->
   version = options.version ||= "full"
   sourceFilename = "chronos-#{version}"
   fullSource = path.join(paths.build, "#{sourceFilename}.js")
-  outputFilename = "#{sourceFilename}-min"
+  outputFilename = "#{sourceFilename}.min"
   fullOutput = path.join(paths.build, "#{outputFilename}.js")
 
   if path.existsSync(fullSource)
@@ -159,10 +120,6 @@ task 'minify', 'Minifies a compiled js file using Uglifier', (options) ->
   else
     console.error "Could not find #{fullSource}. Did you run the 'build' task yet?".red
     process.exit 1
-
-
-
-
 
 
 task 'watch', 'Automatically recompile CoffeeScript files to JavaScript', ->
@@ -210,7 +167,6 @@ task 'watch', 'Automatically recompile CoffeeScript files to JavaScript', ->
 #           console.error "   #{level}  Line #{res.lineNumber}: #{res.message}"
 #       else
 #         console.log "#{pass}  #{shortPath}".green
-
 
 
 
