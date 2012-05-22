@@ -1,7 +1,7 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:300italic,700italic,300,700);
 
 body {
-  padding:50px;
+  padding:25px;
   font:16px/1.5 Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
   color:#777;
   font-weight:300;
@@ -207,7 +207,11 @@ footer {
   width:270px;
   float:left;
   position:fixed;
-  bottom:16px;
+  bottom:5px;
+}
+
+footer p:last-child {
+  margin-bottom: 0px;
 }
 
 @media print, screen and (max-width: 960px) {
