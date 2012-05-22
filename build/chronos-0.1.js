@@ -98,13 +98,13 @@ chronos.Chronos = (function() {
   };
 
   Chronos.prototype._buildDisplayElement = function() {
-    var $displayElement, $ve, df, displayClass, initValue, s,
+    var $displayElement, $ve, d, df, displayClass, initValue, s,
       _this = this;
     s = this.current.options;
     df = new chronos.DateFormatter(s);
     $ve = $(this.current.valueElement);
     initValue = $ve.val();
-    initValue = initValue ? df.format(initValue, s.displayFormat) : s.startBlank ? "" : this.current.options.pickedDateTime ? df.format(this.current.options.pickedDateTime, s.displayFormat) : df.format(new Date(), s.displayFormat);
+    initValue = initValue ? df.format(initValue, s.displayFormat) : s.startBlank ? "" : this.current.options.pickedDateTime ? ($ve.val(df.format(this.current.options.pickedDateTime, s.valueFormat)), df.format(this.current.options.pickedDateTime, s.displayFormat)) : (d = new Date(), $ve.val(df.format(d, s.valueFormat)), df.format(d, s.displayFormat));
     displayClass = "chronos_picker_display";
     if (this.current.options.pickerClass) {
       displayClass += " " + this.current.options.pickerClass + "_display";

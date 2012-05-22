@@ -117,9 +117,12 @@ class chronos.Chronos
         ""
       else
         if @current.options.pickedDateTime
+          $ve.val(df.format(@current.options.pickedDateTime, s.valueFormat))
           df.format(@current.options.pickedDateTime, s.displayFormat)
         else
-          df.format(new Date(), s.displayFormat)
+          d = new Date()
+          $ve.val(df.format(d, s.valueFormat))
+          df.format(d, s.displayFormat)
 
     displayClass = "chronos_picker_display"
     displayClass += " #{@current.options.pickerClass}_display" if @current.options.pickerClass
