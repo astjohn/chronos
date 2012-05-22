@@ -30,7 +30,6 @@ class chronos.Chronos
     pmAbbrUpper: 'P'
     startBlank: false # allow the datepicker to start empty / blank
     displayFormat: 'isoDate' # format to display after making selection through picker
-    typedInputFormat: 'isoDate' # format to allow user to manually type in value
     valueFormat: 'U' # format to post to the server
     yearsPerPage: 20
     maxDate: undefined

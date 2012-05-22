@@ -65,7 +65,7 @@ class chronos.Picker
   # If the date is valid, it will set the valueElement's value and trigger the
   # 'validDate' event.  Otherwise, it will trigger the 'invalidDate' event.
   checkAndSetDate: ->
-    date = @dateFormatter.unformat(@$displayElement.val(), @current.options.typedInputFormat)
+    date = @dateFormatter.unformat(@$displayElement.val(), @current.options.displayFormat)
     unless date == false
       @_saveDate(date)
       @_updateValueElement()

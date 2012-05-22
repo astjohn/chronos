@@ -7,7 +7,9 @@ Chronos is a jQuery and Zepto compatible datepicker plugin. Chronos is capable o
 1. Run `npm install` to install local dependencies.
 2. Run `cake watch` to automatically compile CoffeeScript to JavaScript.
 3. Write some tests and watch them fail using `SpecRunner.html`.
-4. Make your tests pass and [submit a pull request](http://help.github.com/send-pull-requests/) for your contribution.
+4. Make your tests pass.
+5. Add an example to the examples folder.  Not only does this help future users, but it also adds another layer of testing.
+6. [Submit a pull request](http://help.github.com/send-pull-requests/) for your contribution.
 
 ## License
 
