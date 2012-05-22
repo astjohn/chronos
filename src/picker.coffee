@@ -6,7 +6,7 @@ class chronos.Picker
     @startingDate = undefined # the start date to show
     @mode = undefined # the mode to render, i.e. months, years, time, etc.
     @todayDate = new Date() # for today
-    @pickedDateTime = current.pickedDateTime
+    @pickedDateTime = current.options.pickedDateTime
     @$valueElement = $(current.valueElement)
     @$displayElement = $(current.displayElement)
     @dateFormatter = new chronos.DateFormatter(current.options)

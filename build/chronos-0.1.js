@@ -104,7 +104,7 @@ chronos.Chronos = (function() {
     df = new chronos.DateFormatter(s);
     $ve = $(this.current.valueElement);
     initValue = $ve.val();
-    initValue = initValue ? df.format(initValue, s.displayFormat) : s.startBlank ? "" : df.format(new Date(), s.displayFormat);
+    initValue = initValue ? df.format(initValue, s.displayFormat) : s.startBlank ? "" : this.current.options.pickedDateTime ? df.format(this.current.options.pickedDateTime, s.displayFormat) : df.format(new Date(), s.displayFormat);
     displayClass = "chronos_picker_display";
     if (this.current.options.pickerClass) {
       displayClass += " " + this.current.options.pickerClass + "_display";
@@ -255,7 +255,7 @@ chronos.Picker = (function() {
     this.startingDate = void 0;
     this.mode = void 0;
     this.todayDate = new Date();
-    this.pickedDateTime = current.pickedDateTime;
+    this.pickedDateTime = current.options.pickedDateTime;
     this.$valueElement = $(current.valueElement);
     this.$displayElement = $(current.displayElement);
     this.dateFormatter = new chronos.DateFormatter(current.options);

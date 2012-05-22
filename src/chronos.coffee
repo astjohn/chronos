@@ -113,7 +113,13 @@ class chronos.Chronos
     initValue = if initValue
       df.format(initValue, s.displayFormat)
     else
-      if s.startBlank then "" else df.format(new Date(), s.displayFormat)
+      if s.startBlank
+        ""
+      else
+        if @current.options.pickedDateTime
+          df.format(@current.options.pickedDateTime, s.displayFormat)
+        else
+          df.format(new Date(), s.displayFormat)
 
     displayClass = "chronos_picker_display"
     displayClass += " #{@current.options.pickerClass}_display" if @current.options.pickerClass
