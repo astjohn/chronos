@@ -200,11 +200,11 @@ class chronos.Picker
   _renderTitle: (titleStr) ->
     @$container.find('.titleText').html(titleStr)
 
-  _renderYears: ->
-    # TODO
+  # _renderYears: ->
+  #   # TODO
 
-  _renderTime: ->
-    # TODO
+  # _renderTime: ->
+  #   # TODO
 
   # fill the picker's body with a range of months to select from
   _renderMonths: ->
@@ -339,7 +339,6 @@ class chronos.Picker
   # to obey law of demeter. i.e. events should occur on valueElement and other objects
   # should be isolated from valueElement
   _passEvents: (event, args) ->
-    #console.log "HERE", event.type, args.slice(1, args.length)
     event.stopPropagation()
     @$valueElement.trigger(event.type, args)
 

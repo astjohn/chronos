@@ -107,6 +107,14 @@
       -webkit-border-radius: 0px;
       -moz-border-radius: 0px;
       border-radius: 0px; }
+  .chronos_picker .monthBody .week5 .day:first-child.unavailable {
+    -webkit-border-bottom-left-radius: 10px;
+    -moz-border-radius-bottomleft: 10px;
+    border-bottom-left-radius: 10px; }
+  .chronos_picker .monthBody .week5 .day:last-child.unavailable {
+    -webkit-border-bottom-right-radius: 10px;
+    -moz-border-radius-bottomright: 10px;
+    border-bottom-right-radius: 10px; }
   .chronos_picker .monthHeader {
     font-weight: bold; }
   .chronos_picker .day {

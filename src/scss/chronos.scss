@@ -132,6 +132,16 @@ $colorOtherMonth: #E1DBFF;
         @include border-radius(0px);
       }
     }
+    .week5 .day:first-child.unavailable, {
+      -webkit-border-bottom-left-radius: $border_radius;
+      -moz-border-radius-bottomleft: $border_radius;
+      border-bottom-left-radius: $border_radius;
+    }
+    .week5 .day:last-child.unavailable, {
+      -webkit-border-bottom-right-radius: $border_radius;
+      -moz-border-radius-bottomright: $border_radius;
+      border-bottom-right-radius: $border_radius;
+    }
   }
   .monthHeader {
     font-weight: bold;

@@ -31,15 +31,15 @@ class chronos.Chronos
     startBlank: false # allow the datepicker to start empty / blank
     displayFormat: 'isoDate' # format to display after making selection through picker
     valueFormat: 'U' # format to post to the server
-    yearsPerPage: 20
+#    yearsPerPage: 20
     maxDate: undefined
     minDate: undefined
     startDay: 0  # Sunday (0) through Saturday (6) - be aware that this may affect your
                  # layout, since the days on the right might have a different margin
     pickedDateTime: undefined # start datepicker at a specific date
-    useTimePicker: false # set to true to be able to set time with date
-    timePickerOnly: false # only use a time picker
-    yearOnly: false # only use yearly selection
+#    useTimePicker: false # set to true to be able to set time with date
+#    timePickerOnly: false # only use a time picker
+#    yearOnly: false # only use yearly selection
     animations: {}
     positionOffset: {top: 0, left: 0} # offset to adjust position of picker
     debug: false

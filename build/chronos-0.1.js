@@ -30,16 +30,11 @@ chronos.Chronos = (function() {
     pmAbbrUpper: 'P',
     startBlank: false,
     displayFormat: 'isoDate',
-    typedInputFormat: 'isoDate',
     valueFormat: 'U',
-    yearsPerPage: 20,
     maxDate: void 0,
     minDate: void 0,
     startDay: 0,
     pickedDateTime: void 0,
-    useTimePicker: false,
-    timePickerOnly: false,
-    yearOnly: false,
     animations: {},
     positionOffset: {
       top: 0,
@@ -314,7 +309,7 @@ chronos.Picker = (function() {
 
   Picker.prototype.checkAndSetDate = function() {
     var date;
-    date = this.dateFormatter.unformat(this.$displayElement.val(), this.current.options.typedInputFormat);
+    date = this.dateFormatter.unformat(this.$displayElement.val(), this.current.options.displayFormat);
     if (date !== false) {
       this._saveDate(date);
       this._updateValueElement();
@@ -453,10 +448,6 @@ chronos.Picker = (function() {
   Picker.prototype._renderTitle = function(titleStr) {
     return this.$container.find('.titleText').html(titleStr);
   };
-
-  Picker.prototype._renderYears = function() {};
-
-  Picker.prototype._renderTime = function() {};
 
   Picker.prototype._renderMonths = function() {
     var start;
