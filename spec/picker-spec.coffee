@@ -17,10 +17,10 @@ describe "Picker", ->
     it "should set @todayDate", ->
       expect(p.todayDate.getDate()).toBeTruthy() # duck type
 
-    it "should set @pickedDateTime", ->
+    it "should set @current.pickedDateTime", ->
       current.pickedDateTime = new Date()
       x = new chronos.Picker(current)
-      expect(x.pickedDateTime.getDate()).toBeTruthy() # duck type
+      expect(x.current.pickedDateTime.getDate()).toBeTruthy() # duck type
 
     it "should set the @$valueElment", ->
       expect(p.$valueElement.hide()).toBeTruthy() # duck type
@@ -499,7 +499,7 @@ describe "Picker", ->
     describe "#_setPickedDate", ->
       describe "when allowed to start blank", ->
         it "does not set the pickedDateTime", ->
-          p.pickedDateTime = null
+          p.current.pickedDateTime = null
           p.current.options.startBlank = true
           p._setPickedDate()
           expect(p.pickedDateTime).toEqual(null)
@@ -507,19 +507,19 @@ describe "Picker", ->
       describe "when not allowed to start blank", ->
         it "does not mess around if a pickedDateTime already exists", ->
           d = Date.parse("2011-04-22")
-          p.pickedDateTime = d
+          p.current.pickedDateTime = d
           p.current.options.startBlank = false
           p.startingDate = Date.parse("2011-04-30")
           p._setPickedDate()
-          expect(p.pickedDateTime.valueOf()).toEqual(d.valueOf())
+          expect(p.current.pickedDateTime.valueOf()).toEqual(d.valueOf())
 
         it "sets the pickedDateTime to the startingDate if undefined", ->
           d = Date.parse("2011-04-22")
-          p.pickedDateTime = undefined
+          p.current.pickedDateTime = undefined
           p.current.options.startBlank = false
           p.startingDate = d
           p._setPickedDate()
-          expect(p.pickedDateTime.valueOf()).toEqual(d.valueOf())
+          expect(p.current.pickedDateTime.valueOf()).toEqual(d.valueOf())
 
   #     # set's the pickers picked date if need be
   # _setPickedDate: ->
@@ -541,7 +541,7 @@ describe "Picker", ->
 
       describe "when no pickedDateTime", ->
         beforeEach ->
-          p.pickedDateTime = undefined
+          p.current.pickedDateTime = undefined
           p.startingDate = new Date("2012-05-10 00:00:00")
 
         it "should build the current month", ->
@@ -562,7 +562,7 @@ describe "Picker", ->
       describe "when pickedDateTime", ->
         beforeEach ->
           p.startingDate = new Date("2012-05-10 00:00:00")
-          p.pickedDateTime = new Date("2013-06-15 00:00:00")
+          p.current.pickedDateTime = new Date("2013-06-15 00:00:00")
 
         it "should build the current month for the pickedDateTime", ->
           p._renderMonths()
@@ -644,11 +644,11 @@ describe "Picker", ->
 
       describe "when a datetime has been picked", ->
         beforeEach ->
-          p.pickedDateTime = new Date()
+          p.current.pickedDateTime = new Date()
 
         it "asks dateFormatter for a pretty string representation", ->
           p._updateDisplayElement()
-          expect(p.dateFormatter.format).toHaveBeenCalledWith(p.pickedDateTime,
+          expect(p.dateFormatter.format).toHaveBeenCalledWith(p.current.pickedDateTime,
             p.current.options.displayFormat)
 
         it "changes the display elements value", ->
@@ -657,7 +657,7 @@ describe "Picker", ->
 
       describe "when a datetime has not been picked", ->
         beforeEach ->
-          p.pickedDateTime = undefined
+          p.current.pickedDateTime = undefined
 
         it "does not call the dateFormatter", ->
           p._updateDisplayElement()
@@ -674,11 +674,11 @@ describe "Picker", ->
 
       describe "when a datetime has been picked", ->
         beforeEach ->
-          p.pickedDateTime = new Date()
+          p.current.pickedDateTime = new Date()
 
         it "asks dateFormatter for a pretty string representation", ->
           p._updateValueElement()
-          expect(p.dateFormatter.format).toHaveBeenCalledWith(p.pickedDateTime,
+          expect(p.dateFormatter.format).toHaveBeenCalledWith(p.current.pickedDateTime,
             p.current.options.valueFormat)
 
         it "changes the display elements value", ->
@@ -687,7 +687,7 @@ describe "Picker", ->
 
       describe "when a datetime has not been picked", ->
         beforeEach ->
-          p.pickedDateTime = undefined
+          p.current.pickedDateTime = undefined
 
         it "does not call the dateFormatter", ->
           p._updateValueElement()
@@ -780,6 +780,22 @@ describe "Picker", ->
         expect(p._isValidDate({whatever: "something"})).toEqual(false)
 
 
+    describe "#_saveDate", ->
+      d = {}
+      beforeEach ->
+        d = new Date()
+        spyOn(p, '_saveSettings')
+
+      it "sets the current pickedDateTime", ->
+        p._saveDate(d)
+        expect(p.current.pickedDateTime).toBe(d)
+
+      it "saves the settings", ->
+        p._saveDate(d)
+        expect(p._saveSettings).toHaveBeenCalled()
+
+
+
     describe "events", ->
       event = {}
       beforeEach ->
@@ -810,10 +826,6 @@ describe "Picker", ->
           spyOn(p, 'close')
 
         describe "when not using time picker", ->
-
-          it "sets @pickedDateTime to the given date", ->
-            p._onDaySelected(event, dayElement, date)
-            expect(p.pickedDateTime).toBe(date)
 
           it "sets @current.pickedDateTime", ->
             p._onDaySelected(event, dayElement, date)

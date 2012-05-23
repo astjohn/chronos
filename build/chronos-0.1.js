@@ -250,12 +250,13 @@ chronos.Picker = (function() {
   Picker.name = 'Picker';
 
   function Picker(current) {
+    var _base;
     this.current = current;
     this.$container = void 0;
     this.startingDate = void 0;
     this.mode = void 0;
     this.todayDate = new Date();
-    this.pickedDateTime = current.options.pickedDateTime;
+    (_base = this.current).pickedDateTime || (_base.pickedDateTime = current.options.pickedDateTime);
     this.$valueElement = $(current.valueElement);
     this.$displayElement = $(current.displayElement);
     this.dateFormatter = new chronos.DateFormatter(current.options);
@@ -368,7 +369,6 @@ chronos.Picker = (function() {
   };
 
   Picker.prototype._saveDate = function(date) {
-    this.pickedDateTime = date;
     this.current.pickedDateTime = date;
     return this._saveSettings();
   };
@@ -400,8 +400,8 @@ chronos.Picker = (function() {
 
   Picker.prototype._setPickedDate = function() {
     if (!this.current.options.startBlank) {
-      if (this.pickedDateTime === void 0 || this.pickedDateTime === null) {
-        return this.pickedDateTime = new Date(this.startingDate.valueOf());
+      if (this.current.pickedDateTime === void 0 || this.current.pickedDateTime === null) {
+        return this.current.pickedDateTime = new Date(this.startingDate.valueOf());
       }
     }
   };
@@ -451,7 +451,7 @@ chronos.Picker = (function() {
 
   Picker.prototype._renderMonths = function() {
     var start;
-    start = this.pickedDateTime || this.startingDate;
+    start = this.current.pickedDateTime || this.startingDate;
     this._buildMonth(start, this.$container.find(".body_curr"));
     this._renderTitle(this.$container.find(".body_curr").find(".monthBody").attr('data-date_title'));
     this._buildMonth(this._changeMonthBy(start, -1), this.$container.find(".body_prev"));
@@ -466,7 +466,7 @@ chronos.Picker = (function() {
       startDay: this.current.options.startDay,
       dayNamesAbbr: this.current.options.dayNamesAbbr,
       monthNames: this.current.options.monthNames,
-      choice: this.pickedDateTime,
+      choice: this.current.pickedDateTime,
       maxDate: this.current.options.maxDate,
       minDate: this.current.options.minDate
     });
@@ -495,16 +495,16 @@ chronos.Picker = (function() {
 
   Picker.prototype._updateValueElement = function() {
     var d;
-    if (this.pickedDateTime) {
-      d = this.dateFormatter.format(this.pickedDateTime, this.current.options.valueFormat);
+    if (this.current.pickedDateTime) {
+      d = this.dateFormatter.format(this.current.pickedDateTime, this.current.options.valueFormat);
       return this.$valueElement.val(d);
     }
   };
 
   Picker.prototype._updateDisplayElement = function() {
     var d;
-    if (this.pickedDateTime) {
-      d = this.dateFormatter.format(this.pickedDateTime, this.current.options.displayFormat);
+    if (this.current.pickedDateTime) {
+      d = this.dateFormatter.format(this.current.pickedDateTime, this.current.options.displayFormat);
       return this.$displayElement.val(d);
     }
   };
@@ -566,7 +566,6 @@ chronos.Picker = (function() {
 
   Picker.prototype._onDaySelected = function(event, dayElement, date) {
     if (!this.current.options.useTimePicker) {
-      this.pickedDateTime = date;
       this.current.pickedDateTime = date;
       this._saveSettings();
       this._updateInputValues();
