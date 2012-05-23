@@ -83,7 +83,10 @@ class chronos.Chronos
     if @current.activePicker
       @current.activePicker.setDate(date)
     else
-      @current.options.pickedDateTime = date
+      df = @_getDateFormatter()
+      @_setDisplayElementValue(df.format(date, @current.options.displayFormat))
+      @_setValueElementValue(df.format(date, @current.options.valueFormat))
+      @current.pickedDateTime = date
       @_saveCurrentSettings()
 
 
@@ -108,6 +111,10 @@ class chronos.Chronos
     @current.displayElement = $de[0]
     @_saveCurrentSettings()
     @
+
+  # create a date formatter
+  _getDateFormatter: ->
+    new chronos.DateFormatter(@current.options)
 
   # creates a duplicate input element for display purposes
   # Returns the display element
@@ -233,6 +240,14 @@ class chronos.Chronos
     @current.activePicker != undefined &&
     @current.activePicker != null &&
     @current.activePicker.$displayElement[0] == target
+
+  # set display element's value
+  _setDisplayElementValue: (value) ->
+    $(@current.displayElement).val(value)
+
+  # set value element's value
+  _setValueElementValue: (value) ->
+    $(@current.valueElement).val(value)
 
 
   ###

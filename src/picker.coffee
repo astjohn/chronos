@@ -6,7 +6,7 @@ class chronos.Picker
     @startingDate = undefined # the start date to show
     @mode = undefined # the mode to render, i.e. months, years, time, etc.
     @todayDate = new Date() # for today
-    @pickedDateTime = current.options.pickedDateTime
+    @current.pickedDateTime ||= current.options.pickedDateTime
     @$valueElement = $(current.valueElement)
     @$displayElement = $(current.displayElement)
     @dateFormatter = new chronos.DateFormatter(current.options)
@@ -119,7 +119,6 @@ class chronos.Picker
 
   # save the given date
   _saveDate: (date) ->
-    @pickedDateTime = date
     @current.pickedDateTime = date
     @_saveSettings()
 
@@ -153,8 +152,8 @@ class chronos.Picker
   # set's the pickers picked date if need be
   _setPickedDate: ->
     unless @current.options.startBlank
-      if @pickedDateTime == undefined || @pickedDateTime == null
-        @pickedDateTime = new Date(@startingDate.valueOf())
+      if @current.pickedDateTime == undefined || @current.pickedDateTime == null
+        @current.pickedDateTime = new Date(@startingDate.valueOf())
 
   # returns container div for picker
   _createContainer: ->
@@ -208,7 +207,7 @@ class chronos.Picker
 
   # fill the picker's body with a range of months to select from
   _renderMonths: ->
-    start = @pickedDateTime || @startingDate # use pickedDateTime over startingDate
+    start = @current.pickedDateTime || @startingDate # use pickedDateTime over startingDate
     @_buildMonth(start, @$container.find(".body_curr"))
     # set title to current month
     @_renderTitle(@$container.find(".body_curr").find(".monthBody").attr('data-date_title'))
@@ -222,7 +221,7 @@ class chronos.Picker
       startDay: @current.options.startDay
       dayNamesAbbr: @current.options.dayNamesAbbr
       monthNames: @current.options.monthNames
-      choice: @pickedDateTime
+      choice: @current.pickedDateTime
       maxDate: @current.options.maxDate
       minDate: @current.options.minDate
     )
@@ -249,14 +248,14 @@ class chronos.Picker
 
   # Update the value element according to the given format
   _updateValueElement: ->
-     if @pickedDateTime
-      d = @dateFormatter.format(@pickedDateTime, @current.options.valueFormat)
+     if @current.pickedDateTime
+      d = @dateFormatter.format(@current.pickedDateTime, @current.options.valueFormat)
       @$valueElement.val(d)
 
   # Update the display element according to the given format
   _updateDisplayElement: ->
-    if @pickedDateTime
-      d = @dateFormatter.format(@pickedDateTime, @current.options.displayFormat)
+    if @current.pickedDateTime
+      d = @dateFormatter.format(@current.pickedDateTime, @current.options.displayFormat)
       @$displayElement.val(d)
 
   # Return the window height
@@ -318,7 +317,6 @@ class chronos.Picker
   # Handle day selection
   _onDaySelected: (event, dayElement, date) ->
     unless @current.options.useTimePicker
-      @pickedDateTime = date
       @current.pickedDateTime = date
       @_saveSettings()
       @_updateInputValues()

@@ -76,6 +76,19 @@ chronos.Chronos = (function() {
     }
   };
 
+  Chronos.prototype.setDate = function(date) {
+    var df;
+    if (this.current.activePicker) {
+      return this.current.activePicker.setDate(date);
+    } else {
+      df = this._getDateFormatter();
+      this._setDisplayElementValue(df.format(date, this.current.options.displayFormat));
+      this._setValueElementValue(df.format(date, this.current.options.valueFormat));
+      this.current.pickedDateTime = date;
+      return this._saveCurrentSettings();
+    }
+  };
+
   /*
       Private methods
   */
@@ -95,6 +108,10 @@ chronos.Chronos = (function() {
     this.current.displayElement = $de[0];
     this._saveCurrentSettings();
     return this;
+  };
+
+  Chronos.prototype._getDateFormatter = function() {
+    return new chronos.DateFormatter(this.current.options);
   };
 
   Chronos.prototype._buildDisplayElement = function() {
@@ -207,6 +224,14 @@ chronos.Chronos = (function() {
 
   Chronos.prototype._isCurrentPicker = function(target) {
     return this.current.activePicker !== void 0 && this.current.activePicker !== null && this.current.activePicker.$displayElement[0] === target;
+  };
+
+  Chronos.prototype._setDisplayElementValue = function(value) {
+    return $(this.current.displayElement).val(value);
+  };
+
+  Chronos.prototype._setValueElementValue = function(value) {
+    return $(this.current.valueElement).val(value);
   };
 
   /*

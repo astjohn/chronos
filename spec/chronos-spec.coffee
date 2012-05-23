@@ -90,16 +90,31 @@ describe "Chronos", ->
         expect(c.current.activePicker.setDate).toHaveBeenCalledWith("a date")
 
       describe "when there is not an active picker", ->
+        formatspy = {}
         beforeEach ->
           c.current =
             activePicker: undefined
             options:
               pickedDateTime: undefined
+          formatspy = jasmine.createSpy("mock a date")
           spyOn(c, '_saveCurrentSettings')
+          spyOn(c, '_getDateFormatter').andReturn(format: ->
+            formatspy
+          )
+          spyOn(c, '_setDisplayElementValue')
+          spyOn(c, '_setValueElementValue')
 
-        it "sets the pickedDateTime to the given date", ->
+        it "sets the current pickedDateTime to the given date", ->
           c.setDate("a date")
-          expect(c.current.options.pickedDateTime).toEqual("a date")
+          expect(c.current.pickedDateTime).toEqual("a date")
+
+        it "sets the display element's value", ->
+          c.setDate("a date")
+          expect(c._setDisplayElementValue).toHaveBeenCalledWith(formatspy)
+
+        it "sets the value element's value", ->
+          c.setDate("a date")
+          expect(c._setValueElementValue).toHaveBeenCalledWith(formatspy)
 
         it "saves the current settings", ->
           c.setDate("a date")
