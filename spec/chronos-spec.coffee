@@ -186,6 +186,10 @@ describe "Chronos", ->
         $de = c._buildDisplayElement()
         expect($ve.hasClass('chronos_picker_value')).toBeTruthy()
 
+      it "does not add the class 'chronos_picker_value' to the display element", ->
+        $de = c._buildDisplayElement()
+        expect($de.hasClass('chronos_picker_value')).toBeFalsy()
+
       it "appends _display onto the id to avoid naming conflict", ->
         $de = c._buildDisplayElement()
         expect($de.attr('id')).toEqual($ve.attr('id') + "_display")

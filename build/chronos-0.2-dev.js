@@ -127,6 +127,7 @@ chronos.Chronos = (function() {
       displayClass += " " + this.current.options.pickerClass + "_display";
     }
     $displayElement = $ve.clone(true).removeAttr('name').attr('id', $ve.attr('id') + '_display').addClass(displayClass).val(initValue);
+    $ve.addClass('chronos_picker_value');
     if (!s.debug) {
       $ve.hide();
     }

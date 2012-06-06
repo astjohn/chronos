@@ -139,7 +139,6 @@ class chronos.Chronos
           $ve.val(df.format(d, s.valueFormat))
           df.format(d, s.displayFormat)
 
-    $ve.addClass('chronos_picker_value')
     displayClass = "chronos_picker_display"
     displayClass += " #{@current.options.pickerClass}_display" if @current.options.pickerClass
     $displayElement = $ve.clone(true) # make copy of input element
@@ -147,6 +146,9 @@ class chronos.Chronos
       .attr('id', $ve.attr('id') + '_display') # avoid id conflict
       .addClass(displayClass)
       .val(initValue) # set initial display value to initial valueElement value
+
+    # Add a distinguishing class for the value element
+    $ve.addClass('chronos_picker_value')
 
     # show valueElement during debug mode
     unless s.debug
