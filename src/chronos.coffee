@@ -139,6 +139,7 @@ class chronos.Chronos
           $ve.val(df.format(d, s.valueFormat))
           df.format(d, s.displayFormat)
 
+    $ve.addClass('chronos_picker_value')
     displayClass = "chronos_picker_display"
     displayClass += " #{@current.options.pickerClass}_display" if @current.options.pickerClass
     $displayElement = $ve.clone(true) # make copy of input element
