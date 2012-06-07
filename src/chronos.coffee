@@ -136,7 +136,8 @@ class chronos.Chronos
 
     # Set initial display value
     initValue = if initValue
-      df.format(initValue, s.displayFormat)
+      d = df.unformat(initValue, s.valueFormat)
+      df.format(d, s.displayFormat)
     else
       if s.startBlank
         ""

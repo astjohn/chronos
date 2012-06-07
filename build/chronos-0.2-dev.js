@@ -132,7 +132,7 @@ chronos.Chronos = (function() {
     df = new chronos.DateFormatter(s);
     $ve = $(this.current.valueElement);
     initValue = $ve.val();
-    initValue = initValue ? df.format(initValue, s.displayFormat) : s.startBlank ? "" : this.current.options.pickedDateTime ? ($ve.val(df.format(this.current.options.pickedDateTime, s.valueFormat)), df.format(this.current.options.pickedDateTime, s.displayFormat)) : (d = new Date(), $ve.val(df.format(d, s.valueFormat)), df.format(d, s.displayFormat));
+    initValue = initValue ? (d = df.unformat(initValue, s.valueFormat), df.format(d, s.displayFormat)) : s.startBlank ? "" : this.current.options.pickedDateTime ? ($ve.val(df.format(this.current.options.pickedDateTime, s.valueFormat)), df.format(this.current.options.pickedDateTime, s.displayFormat)) : (d = new Date(), $ve.val(df.format(d, s.valueFormat)), df.format(d, s.displayFormat));
     displayClass = "chronos_picker_display";
     if (this.current.options.pickerClass) {
       displayClass += " " + this.current.options.pickerClass + "_display";
@@ -444,7 +444,11 @@ chronos.Picker = (function() {
   Picker.prototype._setPickedDate = function() {
     if (!this.current.options.startBlank) {
       if (this.current.pickedDateTime === void 0 || this.current.pickedDateTime === null) {
-        return this.current.pickedDateTime = new Date(this.startingDate.valueOf());
+        if (this.$valueElement.val() === "" || this.$valueElement.val() === null) {
+          return this.current.pickedDateTime = new Date(this.startingDate.valueOf());
+        } else {
+          return this.current.pickedDateTime = this.dateFormatter.unformat(this.$valueElement.val(), this.current.options.valueFormat);
+        }
       }
     }
   };

@@ -110,7 +110,7 @@ class chronos.DateFormatter
             # need to add 12 hours to time
             date[_ + 'Hours'](date[__ + 'Hours']() + 12)
         when 'Z' then null # do not handle time zones
-        when 'U' then date[_ + 'Time'](target) # yeah, right.
+        when 'U' then date[_ + 'Time'](target)
         else
           notCounter += 1
 

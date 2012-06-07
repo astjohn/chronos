@@ -161,7 +161,10 @@ class chronos.Picker
   _setPickedDate: ->
     unless @current.options.startBlank
       if @current.pickedDateTime == undefined || @current.pickedDateTime == null
-        @current.pickedDateTime = new Date(@startingDate.valueOf())
+        if @$valueElement.val() == "" || @$valueElement.val() == null
+          @current.pickedDateTime = new Date(@startingDate.valueOf())
+        else
+          @current.pickedDateTime = @dateFormatter.unformat(@$valueElement.val(), @current.options.valueFormat)
 
   # returns container div for picker
   _createContainer: ->
