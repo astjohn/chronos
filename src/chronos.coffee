@@ -73,8 +73,8 @@ class chronos.Chronos
     if @current.activePicker
       @current.activePicker.setDateRange(range)
     else
-      @current.options.minDate = range.minDate if range.minDate
-      @current.options.maxDate = range.maxDate if range.maxDate
+      @current.options.minDate = range.minDate if range.minDate != undefined
+      @current.options.maxDate = range.maxDate if range.maxDate != undefined
       @_saveCurrentSettings()
 
   # set the picker's current date
@@ -87,6 +87,16 @@ class chronos.Chronos
       @_setDisplayElementValue(df.format(date, @current.options.displayFormat))
       @_setValueElementValue(df.format(date, @current.options.valueFormat))
       @current.pickedDateTime = date
+      @_saveCurrentSettings()
+
+  # clear date
+  clearDate: ->
+    if @current.activePicker
+      @current.activePicker.clearDate()
+    else
+      @_setDisplayElementValue("")
+      @_setValueElementValue("")
+      @current.pickedDateTime = null
       @_saveCurrentSettings()
 
 

@@ -60,6 +60,14 @@ class chronos.Picker
       @_saveDate(date)
       @_updateInputValues()
 
+  # Clear the currently selected date
+  clearDate: ->
+    @$displayElement.val("")
+    @$valueElement.val("")
+    @current.pickedDateTime = null
+
+
+
   # This method will check for a valid date within the displayElement after a keypress
   # handled within Chronos' _onDisplayKeyPress.
   # If the date is valid, it will set the valueElement's value and trigger the
@@ -76,13 +84,13 @@ class chronos.Picker
 
   setDateRange: (range) ->
     if range.minDate
-      if @_isValidDate(range.minDate)
+      if @_isValidDate(range.minDate) || range.minDate == null
         @current.options.minDate = range.minDate
         @_saveSettings()
       else
         console.warn("chronos: Invalid minDate")
 
-    if range.maxDate
+    if range.maxDate || range.maxDate == null
       if @_isValidDate(range.maxDate)
         @current.options.maxDate = range.maxDate
         @_saveSettings()

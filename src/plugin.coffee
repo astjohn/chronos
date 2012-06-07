@@ -51,6 +51,17 @@
       $.chronos.setDateRange(range)
       @
 
+    @setDate = (d) ->
+      _pluginSetCurrentElement.apply(@)
+      $.chronos.setDate(d)
+      @
+
+    @clearDate = ->
+      _pluginSetCurrentElement.apply(@)
+      $.chronos.clearDate()
+      @
+
+
     ###
       PRIVATE METHODS
     ###

@@ -66,10 +66,10 @@ chronos.Chronos = (function() {
     if (this.current.activePicker) {
       return this.current.activePicker.setDateRange(range);
     } else {
-      if (range.minDate) {
+      if (range.minDate !== void 0) {
         this.current.options.minDate = range.minDate;
       }
-      if (range.maxDate) {
+      if (range.maxDate !== void 0) {
         this.current.options.maxDate = range.maxDate;
       }
       return this._saveCurrentSettings();
@@ -85,6 +85,17 @@ chronos.Chronos = (function() {
       this._setDisplayElementValue(df.format(date, this.current.options.displayFormat));
       this._setValueElementValue(df.format(date, this.current.options.valueFormat));
       this.current.pickedDateTime = date;
+      return this._saveCurrentSettings();
+    }
+  };
+
+  Chronos.prototype.clearDate = function() {
+    if (this.current.activePicker) {
+      return this.current.activePicker.clearDate();
+    } else {
+      this._setDisplayElementValue("");
+      this._setValueElementValue("");
+      this.current.pickedDateTime = null;
       return this._saveCurrentSettings();
     }
   };
@@ -334,6 +345,12 @@ chronos.Picker = (function() {
     }
   };
 
+  Picker.prototype.clearDate = function() {
+    this.$displayElement.val("");
+    this.$valueElement.val("");
+    return this.current.pickedDateTime = null;
+  };
+
   Picker.prototype.checkAndSetDate = function() {
     var date;
     date = this.dateFormatter.unformat(this.$displayElement.val(), this.current.options.displayFormat);
@@ -349,14 +366,14 @@ chronos.Picker = (function() {
 
   Picker.prototype.setDateRange = function(range) {
     if (range.minDate) {
-      if (this._isValidDate(range.minDate)) {
+      if (this._isValidDate(range.minDate) || range.minDate === null) {
         this.current.options.minDate = range.minDate;
         this._saveSettings();
       } else {
         console.warn("chronos: Invalid minDate");
       }
     }
-    if (range.maxDate) {
+    if (range.maxDate || range.maxDate === null) {
       if (this._isValidDate(range.maxDate)) {
         this.current.options.maxDate = range.maxDate;
         this._saveSettings();
@@ -1228,6 +1245,16 @@ chronos.Animator = (function() {
     this.setDateRange = function(range) {
       _pluginSetCurrentElement.apply(this);
       $.chronos.setDateRange(range);
+      return this;
+    };
+    this.setDate = function(d) {
+      _pluginSetCurrentElement.apply(this);
+      $.chronos.setDate(d);
+      return this;
+    };
+    this.clearDate = function() {
+      _pluginSetCurrentElement.apply(this);
+      $.chronos.clearDate();
       return this;
     };
     /*

@@ -120,6 +120,43 @@ describe "Chronos", ->
           c.setDate("a date")
           expect(c._saveCurrentSettings).toHaveBeenCalled()
 
+
+    describe "#clearDate", ->
+      it "calls clearDate on the picker if there is an active picker", ->
+        c.current =
+          activePicker:
+            clearDate: "whatever"
+        spyOn(c.current.activePicker, 'clearDate')
+        c.clearDate()
+        expect(c.current.activePicker.clearDate).toHaveBeenCalled()
+
+      describe "when there is not an active picker", ->
+        formatspy = {}
+        beforeEach ->
+          c.current =
+            activePicker: undefined
+            options:
+              pickedDateTime: "SOMETHING"
+          spyOn(c, '_saveCurrentSettings')
+          spyOn(c, '_setDisplayElementValue')
+          spyOn(c, '_setValueElementValue')
+
+        it "sets the current pickedDateTime to null", ->
+          c.clearDate()
+          expect(c.current.pickedDateTime).toEqual(null)
+
+        it "clears the display element's value", ->
+          c.clearDate()
+          expect(c._setDisplayElementValue).toHaveBeenCalledWith("")
+
+        it "clears the value element's value", ->
+          c.clearDate()
+          expect(c._setValueElementValue).toHaveBeenCalledWith("")
+
+        it "saves the current settings", ->
+          c.clearDate()
+          expect(c._saveCurrentSettings).toHaveBeenCalled()
+
   describe "private methods", ->
 
     describe "#_attach", ->

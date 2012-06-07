@@ -128,7 +128,7 @@ describe "Picker", ->
           expect(p._getPosition).not.toHaveBeenCalled()
 
 
-    describe "setDate", ->
+    describe "#setDate", ->
       beforeEach ->
         spyOn(p, '_saveDate')
         spyOn(p, '_updateInputValues')
@@ -150,9 +150,27 @@ describe "Picker", ->
         it "calls _updateInputValues", ->
           expect(p._updateInputValues).toHaveBeenCalled()
 
+    describe "#clearDate", ->
+      beforeEach ->
+        p.current.pickedDateTime = "SOMETHING"
+        p.$displayElement.val("TEST")
+        p.$valueElement.val("TEST")
 
-    describe "checkAndSetDate", ->
+      it "should clear the displayElement's value", ->
+        p.clearDate()
+        expect(p.$displayElement.val()).toEqual("")
 
+      it "should clear the valueElement's value", ->
+        p.clearDate()
+        expect(p.$valueElement.val()).toEqual("")
+
+      it "should set the pickedDateTime to null", ->
+        p.clearDate()
+        expect(p.current.pickedDateTime).toEqual(null)
+
+
+
+    describe "#checkAndSetDate", ->
       describe "when invalid date", ->
         beforeEach ->
           spyOn(p.dateFormatter, 'unformat').andReturn(false)
