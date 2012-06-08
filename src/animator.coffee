@@ -99,7 +99,7 @@ class chronos.Animator
     @$prev.removeAttr('style')
     @$next.removeAttr('style')
 
-    newCurrentDate = new Date(parseInt(@$prev.find(".monthBody").attr('data-date')))
+    newCurrentDate = new Date(parseInt(@$prev.find(".monthBody").attr('data-date'), 10))
     pickerManager._buildMonth(pickerManager._changeMonthBy(newCurrentDate, -1), $new_prev)
     @_setElements()
 
@@ -133,7 +133,7 @@ class chronos.Animator
     @$prev.removeAttr('style')
     @$next.removeAttr('style')
 
-    newCurrentDate = new Date(parseInt(@$next.find(".monthBody").attr('data-date')))
+    newCurrentDate = new Date(parseInt(@$next.find(".monthBody").attr('data-date'), 10))
     pickerManager._buildMonth(pickerManager._changeMonthBy(newCurrentDate, 1), $new_next)
     @_setElements()
 

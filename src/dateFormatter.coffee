@@ -53,7 +53,7 @@ class chronos.DateFormatter
 
   newZeroDate: ->
     d = new Date()
-    d.setDate(0)
+    d.setDate(1) # setting to zero will shift back to last hour of previous month
     d.setMonth(0)
     d.setFullYear(0)
     d.setHours(0)
@@ -68,7 +68,6 @@ class chronos.DateFormatter
 
     mask = String(dF.masks[mask] or mask or dF.masks["default"])
     date = @newZeroDate()
-    date.setHours(0)
     maskParts = mask.split(/\W+/)
     dateParts = dateStr.split(/\W+/)
     notCounter = 0
@@ -83,7 +82,7 @@ class chronos.DateFormatter
       switch (targetMask)
         when 'd', 'dd' then date[_ + 'Date'](target)
         when 'ddd', 'dddd' then null # do nothing
-        when 'm', 'mm' then date[_ + 'Month'](parseInt(target)-1)
+        when 'm', 'mm' then date[_ + 'Month'](parseInt(target, 10)-1)
         when 'mmm' then date[_ + 'Month'](dF.i18n.monthNames.indexOf(target))
         when 'mmmm' then date[_ + 'Month'](dF.i18n.monthNames.indexOf(target)-12)
         #when 'yy'  # need full year so do not perform

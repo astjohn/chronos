@@ -698,7 +698,7 @@ chronos.DateFormatter = (function() {
   DateFormatter.prototype.newZeroDate = function() {
     var d;
     d = new Date();
-    d.setDate(0);
+    d.setDate(1);
     d.setMonth(0);
     d.setFullYear(0);
     d.setHours(0);
@@ -713,7 +713,6 @@ chronos.DateFormatter = (function() {
     dF = this;
     mask = String(dF.masks[mask] || mask || dF.masks["default"]);
     date = this.newZeroDate();
-    date.setHours(0);
     maskParts = mask.split(/\W+/);
     dateParts = dateStr.split(/\W+/);
     notCounter = 0;
@@ -734,7 +733,7 @@ chronos.DateFormatter = (function() {
           break;
         case 'm':
         case 'mm':
-          date[_ + 'Month'](parseInt(target) - 1);
+          date[_ + 'Month'](parseInt(target, 10) - 1);
           break;
         case 'mmm':
           date[_ + 'Month'](dF.i18n.monthNames.indexOf(target));
@@ -1145,7 +1144,7 @@ chronos.Animator = (function() {
     this.$curr.removeAttr('style');
     this.$prev.removeAttr('style');
     this.$next.removeAttr('style');
-    newCurrentDate = new Date(parseInt(this.$prev.find(".monthBody").attr('data-date')));
+    newCurrentDate = new Date(parseInt(this.$prev.find(".monthBody").attr('data-date'), 10));
     pickerManager._buildMonth(pickerManager._changeMonthBy(newCurrentDate, -1), $new_prev);
     return this._setElements();
   };
@@ -1176,7 +1175,7 @@ chronos.Animator = (function() {
     this.$curr.removeAttr('style');
     this.$prev.removeAttr('style');
     this.$next.removeAttr('style');
-    newCurrentDate = new Date(parseInt(this.$next.find(".monthBody").attr('data-date')));
+    newCurrentDate = new Date(parseInt(this.$next.find(".monthBody").attr('data-date'), 10));
     pickerManager._buildMonth(pickerManager._changeMonthBy(newCurrentDate, 1), $new_next);
     return this._setElements();
   };
