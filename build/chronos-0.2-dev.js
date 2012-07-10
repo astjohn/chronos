@@ -544,7 +544,8 @@ chronos.Picker = (function() {
     var d;
     if (this.current.pickedDateTime) {
       d = this.dateFormatter.format(this.current.pickedDateTime, this.current.options.valueFormat);
-      return this.$valueElement.val(d);
+      this.$valueElement.val(d);
+      return this.$valueElement.attr("value", d);
     }
   };
 
@@ -552,7 +553,8 @@ chronos.Picker = (function() {
     var d;
     if (this.current.pickedDateTime) {
       d = this.dateFormatter.format(this.current.pickedDateTime, this.current.options.displayFormat);
-      return this.$displayElement.val(d);
+      this.$displayElement.val(d);
+      return this.$displayElement.attr("value", d);
     }
   };
 

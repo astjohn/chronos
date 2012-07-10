@@ -43,7 +43,7 @@
       background-image: -o-linear-gradient(top, #3dacff, #005da3);
       background-image: linear-gradient(top, #3dacff, #005da3);
       background-repeat: repeat-x;
-      filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=$startColor, endColorstr=$endColor, GradientType=0);
+      filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#3dacff, endColorstr=#005da3, GradientType=0);
       text-shadow: 0 1px 0 rgba(150, 150, 150, 0.8); }
       .chronos_picker .header .title:hover, .chronos_picker .header .previous:hover, .chronos_picker .header .next:hover {
         color: white;
@@ -57,7 +57,7 @@
         background-image: -o-linear-gradient(top, #005da3, #00060a);
         background-image: linear-gradient(top, #005da3, #00060a);
         background-repeat: repeat-x;
-        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=$startColor, endColorstr=$endColor, GradientType=0); }
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#005da3, endColorstr=#00060a, GradientType=0); }
   .chronos_picker .previous, .chronos_picker .title, .chronos_picker .next {
     display: inline-block;
     padding: 5px 10px; }
