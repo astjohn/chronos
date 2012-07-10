@@ -674,9 +674,13 @@ describe "Picker", ->
           expect(p.dateFormatter.format).toHaveBeenCalledWith(p.current.pickedDateTime,
             p.current.options.displayFormat)
 
-        it "changes the display elements value", ->
+        it "changes the display element's value", ->
           p._updateDisplayElement()
           expect(p.$displayElement.val()).toEqual("a date")
+
+        it "changes the display element's value attribute for IE", ->
+          p._updateDisplayElement()
+          expect(p.$displayElement.attr("value")).toEqual("a date")
 
       describe "when a datetime has not been picked", ->
         beforeEach ->
@@ -686,10 +690,13 @@ describe "Picker", ->
           p._updateDisplayElement()
           expect(p.dateFormatter.format).not.toHaveBeenCalled()
 
-        it "does not update the display element", ->
+        it "does not update the display element's value", ->
           p._updateDisplayElement()
           expect(p.$displayElement.val()).toEqual("")
 
+        it "does not change the display element's value attribute for IE", ->
+          p._updateDisplayElement()
+          expect(p.$displayElement.attr("value")).toEqual("")
 
     describe "#_updateValueElement", ->
       beforeEach ->
@@ -704,9 +711,13 @@ describe "Picker", ->
           expect(p.dateFormatter.format).toHaveBeenCalledWith(p.current.pickedDateTime,
             p.current.options.valueFormat)
 
-        it "changes the display elements value", ->
+        it "changes the value elements value", ->
           p._updateValueElement()
           expect(p.$valueElement.val()).toEqual("a date")
+
+        it "changes the value element's value attribute for IE", ->
+          p._updateValueElement()
+          expect(p.$valueElement.attr("value")).toEqual("a date")
 
       describe "when a datetime has not been picked", ->
         beforeEach ->
@@ -716,10 +727,13 @@ describe "Picker", ->
           p._updateValueElement()
           expect(p.dateFormatter.format).not.toHaveBeenCalled()
 
-        it "does not update the display element", ->
+        it "does not update the value element", ->
           p._updateValueElement()
           expect(p.$valueElement.val()).toEqual("")
 
+        it "does not change the value element's value attribute for IE", ->
+          p._updateValueElement()
+          expect(p.$valueElement.attr("value")).toEqual("")
 
     describe "#_getWindowHeight", ->
     describe "#_getScrollTop", ->

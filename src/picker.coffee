@@ -262,12 +262,14 @@ class chronos.Picker
      if @current.pickedDateTime
       d = @dateFormatter.format(@current.pickedDateTime, @current.options.valueFormat)
       @$valueElement.val(d)
+      @$valueElement.attr("value", d)
 
   # Update the display element according to the given format
   _updateDisplayElement: ->
     if @current.pickedDateTime
       d = @dateFormatter.format(@current.pickedDateTime, @current.options.displayFormat)
       @$displayElement.val(d)
+      @$displayElement.attr("value", d)
 
   # Return the window height
   _getWindowHeight: ->
