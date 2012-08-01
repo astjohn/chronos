@@ -25,7 +25,7 @@ paths.srcScss = path.join paths.src, 'scss'
 
 # Create directories if they do not already exist
 for dir in [paths.build, paths.tmp]
-  fs.mkdirSync dir, '0755' if not path.existsSync dir
+  fs.mkdirSync dir, '0755' if not fs.existsSync dir
 
 ## = APP FILES = ##
 appFiles  = [
@@ -108,7 +108,7 @@ task 'minify', 'Minifies a compiled js file using Uglifier', (options) ->
   outputFilename = "#{sourceFilename}.min"
   fullOutput = path.join(paths.build, "#{outputFilename}.js")
 
-  if path.existsSync(fullSource)
+  if fs.existsSync(fullSource)
     console.log "Minifying with Uglifier".yellow
     exec "node_modules/uglify-js/bin/uglifyjs -nc --output #{fullOutput} #{fullSource}", (err, stdout, stderr) ->
       if err

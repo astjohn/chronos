@@ -1,5 +1,5 @@
 describe "PanelMonth", ->
-  givenDate = new Date("2012-05-12")
+  givenDate = new Date(2012, 4, 12)
   options =
     month: givenDate.getMonth()
     givenDate: givenDate

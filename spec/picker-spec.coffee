@@ -611,7 +611,7 @@ describe "Picker", ->
         p._buildMonth(d, $container)
         expect($container.find(".monthPanel").length).toEqual(1)
 
-      # TODO: This test works in isolation, but not during full suite
+      # TODO: This test works in isolation, but not during full suite (???)
       # it "should handle day click events", ->
       #   spyOn(p, '_onDaySelect')
       #   $test = p._buildMonth(d, $container)
@@ -638,6 +638,39 @@ describe "Picker", ->
         test.setMonth(d.getMonth() + 5)
         expect(p._changeMonthBy(d, 5).valueOf()).toEqual(test.valueOf())
 
+      describe "when on the 31st of a month", ->
+        answer = ""
+        beforeEach ->
+          d = new Date(2012, 6, 31)
+          answer = p._changeMonthBy(d, -1)
+
+        describe "when decrementing the month", ->
+          it "can decrease the date by the given months", ->
+            expect(answer.getMonth()).toEqual(5)
+
+          it "sets the day to 30th when appropriate", ->
+            expect(answer.getDate()).toEqual(30)
+
+    describe "#_daysInMonth", ->
+      describe "for a month with 31 days", ->
+        it "responds with 31", ->
+          d = new Date(2012, 6, 10)
+          expect(p._daysInMonth(d)).toEqual(31)
+
+      describe "for a month with 30 days", ->
+        it "responds with 30", ->
+          d = new Date(2012, 5, 10)
+          expect(p._daysInMonth(d)).toEqual(30)
+
+      describe "for a month with 28 days", ->
+        it "responds with 28", ->
+          d = new Date(2011, 1, 10)
+          expect(p._daysInMonth(d)).toEqual(28)
+
+      describe "for a leap year month with 29 days", ->
+        it "responds with 29", ->
+          d = new Date(2012, 1, 10)
+          expect(p._daysInMonth(d)).toEqual(29)
 
     describe "#_saveSettings", ->
       it "uses jquery $.data to save settings for the displayElement", ->

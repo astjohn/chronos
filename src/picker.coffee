@@ -243,10 +243,25 @@ class chronos.Picker
     $container.append(month)
 
   # Increment or decrement given date by given value in months
+  # Javascript will not always simply shift the month. For example, if we
+  # are on the 31st day, and we want to move backwards to a month with
+  # 30 days, it will not happen.
   _changeMonthBy: (date, value) ->
     d = new Date(date.valueOf())
-    d.setMonth(d.getMonth() + value)
+    currentDate = d.getDate()
+    # set date to 1 so month change will always happen, then set month.
+    # Finally, set date to either original day or number of days in month,
+    # whichever is smaller (to avoid setting to date higher than month allows)
+    d.setDate(1)
+    d.setMonth(date.getMonth() + value)
+    d.setDate(Math.min(currentDate, @_daysInMonth(d)))
     d
+
+  # This assumes that the client can determine leap years.
+  # Javascript wraps dates into following month. For example, 32nd day of March
+  # is considered 1st of April. Subtract 1 from 32 to get correct days in March.
+  _daysInMonth: (date) ->
+    32 - new Date(date.getFullYear(), date.getMonth(), 32).getDate()
 
   # Save View Element's Settings
   _saveSettings: ->

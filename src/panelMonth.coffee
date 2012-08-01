@@ -24,8 +24,8 @@ class chronos.PanelMonth
   ###
 
   # Creates a date representing the start of the calendar month panel
-  # first set given date to beginning of month
-  # then iterate backwards until we have found the start day as specified in options
+  # first, set given date to beginning of month and then iterate backwards
+  # until we have found the start day as specified in options
   # eg. sunday, monday, etc.
   # this will traverse through days in previous month if need be
   _getMonthStart: ->
